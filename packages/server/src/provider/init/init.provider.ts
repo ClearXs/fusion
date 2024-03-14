@@ -78,16 +78,16 @@ export class InitProvider {
   }
   async initRestoreKey() {
     const key = makeSalt();
-    await this.cacheProvider.set('restoreKey', key);
-    const filePath = path.join('/var/log/', 'restore.key');
-    try {
-      fs.writeFileSync(filePath, key, { encoding: 'utf-8' });
-    } catch (err) {
-      this.logger.error('写入恢复密钥到文件失败！');
-    }
-    this.logger.warn(
-      `忘记密码恢复密钥为： ${key}\n 注意此密钥也会同时写入到日志目录中的 restore.key 文件中，每次重启 vanblog 或老密钥被使用时都会重新生成此密钥`,
-    );
+    // await this.cacheProvider.set('restoreKey', key);
+    // const filePath = path.join('/var/log/', 'restore.key');
+    // try {
+    //   fs.writeFileSync(filePath, key, { encoding: 'utf-8' });
+    // } catch (err) {
+    //   this.logger.error('写入恢复密钥到文件失败！');
+    // }
+    // this.logger.warn(
+    //   `忘记密码恢复密钥为： ${key}\n 注意此密钥也会同时写入到日志目录中的 restore.key 文件中，每次重启 vanblog 或老密钥被使用时都会重新生成此密钥`,
+    // );
   }
 
   async washStaticSetting() {

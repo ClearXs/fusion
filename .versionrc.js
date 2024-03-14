@@ -1,6 +1,6 @@
 module.exports = {
   header: '# Changelog',
-  commitUrlFormat: '{{host}}/{{owner}}/{{repository}}/commit/{{hash}}',
+  commitUrlFormat: '{{host}}/{{owner}}/{{repo}}/commit/{{hash}}',
   types: [
     { type: 'feat', section: '✨ Features | 新功能' },
     { type: 'fix', section: '🐛 Bug Fixes | Bug 修复' },

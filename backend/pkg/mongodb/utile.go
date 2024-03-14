@@ -1,0 +1,155 @@
+package mongodb
+
+import (
+	"go.mongodb.org/mongo-driver/bson"
+)
+
+type Predicate = string
+
+const (
+	Or  Predicate = "$or"
+	And Predicate = "$and"
+	Nor Predicate = "$nor"
+)
+
+type Logical interface {
+	// GetPredicate 获取逻辑谓词
+	GetPredicate() Predicate
+	// Append 追加用于查询的数据
+	Append(ele bson.E) Logical
+	// AppendArray 追加用于查询的数据 bson array
+	AppendArray(ele bson.D) Logical
+	// AppendLogical 追加逻辑谓词
+	AppendLogical(other Logical) Logical
+	// GetBson 获取加上逻辑谓词的bson数据
+	GetBson() bson.E
+}
+
+type LogicImpl struct {
+	predicate  Predicate
+	additional []bson.E
+}
+
+// NewLogical 创建默认的逻辑词，默认是And
+func NewLogical() Logical {
+	return NewLogicalAnd()
+}
+
+// NewLogicalDefault 创建默认的逻辑词，默认是And
+func NewLogicalDefault(ele bson.E) Logical {
+	return NewLogicalAndDefault(ele)
+}
+
+// NewLogicalDefaultArray 创建默认的逻辑词，默认是And
+func NewLogicalDefaultArray(ele bson.D) Logical {
+	return NewLogicalAndDefaultArray(ele)
+}
+
+// NewLogicalDefaultLogical 创建默认的逻辑词，默认是And
+func NewLogicalDefaultLogical(other Logical) Logical {
+	return NewLogicalAndDefaultLogical(other)
+}
+
+// NewLogicalOr 创建逻辑or谓词
+func NewLogicalOr() Logical {
+	return &LogicImpl{predicate: Or, additional: make([]bson.E, 0)}
+}
+
+// NewLogicalOrDefault 创建逻辑or谓词
+func NewLogicalOrDefault(ele bson.E) Logical {
+	logical := NewLogicalOr()
+	logical.Append(ele)
+	return logical
+}
+
+// NewLogicalOrDefaultArray 创建逻辑or谓词
+func NewLogicalOrDefaultArray(ele bson.D) Logical {
+	logical := NewLogicalOr()
+	logical.AppendArray(ele)
+	return logical
+}
+
+// NewLogicalOrDefaultLogical 创建逻辑or谓词
+func NewLogicalOrDefaultLogical(other Logical) Logical {
+	logical := NewLogicalOr()
+	logical.AppendLogical(other)
+	return logical
+}
+
+// NewLogicalAnd 创建逻辑and谓词
+func NewLogicalAnd() Logical {
+	return &LogicImpl{predicate: And, additional: make([]bson.E, 0)}
+}
+
+// NewLogicalAndDefault 创建逻辑and谓词
+func NewLogicalAndDefault(ele bson.E) Logical {
+	logical := NewLogicalAnd()
+	logical.Append(ele)
+	return logical
+}
+
+// NewLogicalAndDefaultArray 创建逻辑and谓词
+func NewLogicalAndDefaultArray(ele bson.D) Logical {
+	logical := NewLogicalAnd()
+	logical.AppendArray(ele)
+	return logical
+}
+
+// NewLogicalAndDefaultLogical 创建逻辑and谓词
+func NewLogicalAndDefaultLogical(other Logical) Logical {
+	logical := NewLogicalAnd()
+	logical.AppendLogical(other)
+	return logical
+}
+
+// NewLogicalNor 创建逻辑nor谓词
+func NewLogicalNor() Logical {
+	return &LogicImpl{predicate: Nor, additional: make([]bson.E, 0)}
+}
+
+// NewLogicalNorDefault 创建逻辑nor谓词
+func NewLogicalNorDefault(ele bson.E) Logical {
+	logical := NewLogicalNor()
+	logical.Append(ele)
+	return logical
+}
+
+// NewLogicalNorDefaultArray 创建逻辑nor谓词
+func NewLogicalNorDefaultArray(ele bson.D) Logical {
+	logical := NewLogicalNor()
+	logical.AppendArray(ele)
+	return logical
+}
+
+// NewLogicalNorDefaultLogical 创建逻辑nor谓词
+func NewLogicalNorDefaultLogical(other Logical) Logical {
+	logical := NewLogicalNor()
+	logical.AppendLogical(other)
+	return logical
+}
+
+func (logic *LogicImpl) GetPredicate() Predicate {
+	return logic.predicate
+}
+
+func (logic *LogicImpl) Append(ele bson.E) Logical {
+	logic.additional = append(logic.additional, ele)
+	return logic
+}
+
+func (logic *LogicImpl) AppendArray(ele bson.D) Logical {
+	logic.additional = append(logic.additional, ele...)
+	return logic
+}
+
+func (logic *LogicImpl) AppendLogical(other Logical) Logical {
+	logic.additional = append(logic.additional, other.GetBson())
+	return logic
+}
+
+func (logic *LogicImpl) GetBson() bson.E {
+	if len(logic.additional) == 0 {
+		return bson.E{}
+	}
+	return bson.E{Key: logic.predicate, Value: logic.additional}
+}

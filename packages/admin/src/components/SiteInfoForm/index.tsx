@@ -172,7 +172,7 @@ export default function (props: {
             isInit={props.isInit}
             name="gaBeianLogoUrl"
             label="公安备案 Logo 地址"
-            placeholder={'请输入公安备案的 logo 的 url，留空不显示公安备案 logo'}
+            placeholder={'请输入公安备案的 logo 的 uri，留空不显示公安备案 logo'}
             required={false}
           />
           <ProFormText

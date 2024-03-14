@@ -79,7 +79,7 @@ if (pwa) {
     });
   });
 } else if ('serviceWorker' in navigator && isHttps) {
-  // unregister service worker
+  // unregister svr worker
   const { serviceWorker } = navigator;
 
   if (serviceWorker.getRegistrations) {

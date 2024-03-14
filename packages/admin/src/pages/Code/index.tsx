@@ -363,7 +363,7 @@ export default function () {
       }}
       footer={null}
     >
-      <div style={{ height: '100%', display: 'flex' }} className="code-editor-content">
+      <div style={{ height: '100%', display: 'flex' }} className="Code-editor-content">
         {isFolder && (
           <>
             <Spin spinning={treeLoading}>

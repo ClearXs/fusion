@@ -1,0 +1,54 @@
+package router
+
+import (
+	"cc.allio/fusion/config"
+	"cc.allio/fusion/internal/svr"
+	"cc.allio/fusion/pkg/web"
+	"errors"
+	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
+)
+
+const AnalysisPathPrefix = "/api/admin/analysis"
+
+type AnalysisRouter struct {
+	Cfg         *config.Config
+	AnalysisSvr *svr.AnalysisService
+}
+
+var AnalysisRouterSet = wire.NewSet(wire.Struct(new(AnalysisRouter), "*"))
+
+// GetWelcomePageData
+// @Summary 获取首页统计数据
+// @Schemes
+// @Description statistic home page data
+// @Tags Analysis
+// @Accept json
+// @Produce json
+// @Param        tab                query      string      true       "tab"              Enums(overview, viewer, article)
+// @Param        viewerDataNum      query      int         false      "overviewDataNum"
+// @Param        overviewDataNum    query      int         false      "overviewDataNum"
+// @Param        articleTabDataNum  query      int         false      "articleTabDataNum"
+// @Router /api/admin/analysis [Get]
+func (router *AnalysisRouter) GetWelcomePageData(c *gin.Context) *R {
+	tab := c.Query("tab")
+	if tab == "overview" {
+		viewerDataNum := web.ParseNumberForQuery(c, "viewerDataNum", 0)
+		overviewData := router.AnalysisSvr.GetOverViewTabData(int64(viewerDataNum))
+		return Ok(overviewData)
+	} else if tab == "viewer" {
+		overviewDataNum := web.ParseNumberForQuery(c, "overviewDataNum", 0)
+		viewerTabData := router.AnalysisSvr.GetViewerTabData(int64(overviewDataNum))
+		return Ok(viewerTabData)
+	} else if tab == "article" {
+		articleTabDataNum := web.ParseNumberForQuery(c, "articleTabDataNum", 0)
+		articleTabData := router.AnalysisSvr.GetArticleTabData(int64(articleTabDataNum))
+		return Ok(articleTabData)
+	} else {
+		return InternalError(errors.New("not found any tab view data"))
+	}
+}
+
+func (router *AnalysisRouter) Register(r *gin.Engine) {
+	r.GET(AnalysisPathPrefix, Handle(router.GetWelcomePageData))
+}

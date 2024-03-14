@@ -47,7 +47,6 @@ export class SiteMapProvider {
     });
     streamToPromise(smStream).then((sm) => {
       const sitemapPath = path.join(config.staticPath, 'sitemap');
-
       fs.mkdirSync(sitemapPath, { recursive: true });
       fs.writeFileSync(path.join(sitemapPath, 'sitemap.xml'), sm);
     });

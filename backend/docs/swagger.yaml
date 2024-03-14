@@ -1,0 +1,1653 @@
+definitions:
+  credential.CategoryCredential:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      private:
+        type: boolean
+    type: object
+  credential.HttpsSettingCredential:
+    properties:
+      redirect:
+        type: boolean
+    type: object
+  credential.MetaCredential:
+    properties:
+      allowDomains:
+        type: string
+      baseUrl:
+        type: string
+      enableComment:
+        type: string
+      latestVersion:
+        type: string
+      updateAt:
+        type: string
+      user: {}
+      version:
+        type: string
+    type: object
+  domain.About:
+    properties:
+      content:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  domain.Article:
+    properties:
+      author:
+        type: string
+      category:
+        type: string
+      content:
+        type: string
+      copyright:
+        type: string
+      createdAt:
+        type: string
+      deleted:
+        type: boolean
+      hidden:
+        type: boolean
+      id:
+        type: integer
+      lastVisitedTime:
+        type: string
+      password:
+        type: string
+      pathname:
+        type: string
+      private:
+        type: boolean
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      top:
+        type: integer
+      updatedAt:
+        type: string
+      viewer:
+        type: integer
+      visited:
+        type: integer
+    type: object
+  domain.ArticlePageResult:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/domain.Article'
+        type: array
+      total:
+        type: integer
+      totalWordCount:
+        type: integer
+    type: object
+  domain.Category:
+    properties:
+      id:
+        type: integer
+      meta: {}
+      name:
+        type: string
+      password:
+        type: string
+      private:
+        type: boolean
+      type:
+        $ref: '#/definitions/domain.CategoryType'
+    type: object
+  domain.CategoryType:
+    enum:
+    - category
+    - column
+    type: string
+    x-enum-varnames:
+    - CategoryCategoryType
+    - ColumnCategoryType
+  domain.Draft:
+    properties:
+      author:
+        type: string
+      category:
+        type: string
+      content:
+        type: string
+      createdAt:
+        type: string
+      deleted:
+        type: boolean
+      id:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  domain.DraftPageResult:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/domain.Draft'
+        type: array
+      total:
+        type: integer
+    type: object
+  domain.HttpSetting:
+    properties:
+      redirect:
+        type: boolean
+    type: object
+  domain.LayoutSetting:
+    properties:
+      css:
+        type: string
+      head:
+        type: string
+      html:
+        type: string
+      script:
+        type: string
+    type: object
+  domain.LinkItem:
+    properties:
+      desc:
+        type: string
+      logo:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  domain.LoginSetting:
+    properties:
+      durationSeconds:
+        type: integer
+      enableMaxLoginRetry:
+        type: boolean
+      expiresIn:
+        type: integer
+      maxRetryTimes:
+        type: integer
+    type: object
+  domain.MenuItem:
+    properties:
+      children:
+        $ref: '#/definitions/domain.MenuItem'
+      id:
+        type: integer
+      level:
+        type: integer
+      name:
+        type: string
+      value:
+        type: string
+    type: object
+  domain.Meta:
+    properties:
+      about:
+        $ref: '#/definitions/domain.About'
+      categories:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      links:
+        items:
+          $ref: '#/definitions/domain.LinkItem'
+        type: array
+      menus:
+        items:
+          $ref: '#/definitions/domain.MenuItem'
+        type: array
+      rewards:
+        items:
+          $ref: '#/definitions/domain.RewardItem'
+        type: array
+      siteInfo:
+        $ref: '#/definitions/domain.SiteInfo'
+      socials:
+        items:
+          $ref: '#/definitions/domain.SocialItem'
+        type: array
+      totalWordCount:
+        type: integer
+      viewer:
+        type: integer
+      visited:
+        type: integer
+    type: object
+  domain.RewardItem:
+    properties:
+      name:
+        type: string
+      updatedAt:
+        type: string
+      value:
+        type: string
+    type: object
+  domain.Site:
+    enum:
+    - siteLogo
+    - siteName
+    type: string
+    x-enum-varnames:
+    - LogoSite
+    - NameSite
+  domain.SiteInfo:
+    properties:
+      allowOpenHiddenPostByUrl:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      authDesc:
+        type: string
+      author:
+        type: string
+      authorLogo:
+        type: string
+      authorLogoDark:
+        type: string
+      baiduAnalysisId:
+        type: string
+      baseUrl:
+        type: string
+      beianNumber:
+        type: string
+      beianUrl:
+        type: string
+      copyrightAggreement:
+        type: string
+      defaultTheme:
+        $ref: '#/definitions/domain.Theme'
+      enableComment:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      enableCustomizing:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      favicon:
+        type: string
+      gaAnalysisId:
+        type: string
+      gaBeianLogoUrl:
+        type: string
+      gaBeianNumber:
+        type: string
+      gaBeianUrl:
+        type: string
+      headerLeftContent:
+        $ref: '#/definitions/domain.Site'
+      openArticleLinksInNewWindow:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      payAliPay:
+        type: string
+      payAliPayDark:
+        type: string
+      payWechat:
+        type: string
+      payWechatDark:
+        type: string
+      showAdminButton:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showCopyRight:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showDonateButton:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showDonateInAbout:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showDonateInfo:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showEditButton:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showExpirationReminder:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showFriends:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showRSS:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      showSubMenu:
+        $ref: '#/definitions/domain.TrueOrFalse'
+      since:
+        type: string
+      siteDesc:
+        type: string
+      siteLogo:
+        type: string
+      siteLogoDark:
+        type: string
+      siteName:
+        type: string
+      subMenuOffset:
+        type: integer
+    type: object
+  domain.SocialItem:
+    properties:
+      type:
+        $ref: '#/definitions/domain.SocialType'
+      updatedAt:
+        type: string
+      value:
+        type: string
+    type: object
+  domain.SocialType:
+    enum:
+    - bilibili
+    - email
+    - github
+    - gitee
+    - wechat
+    - wechat-dark
+    type: string
+    x-enum-varnames:
+    - BilibiliSocialType
+    - EmailSocialType
+    - GithubSocialType
+    - GiteeSocialType
+    - WechatSocialType
+    - WechatDarkSocialType
+  domain.StaticSetting:
+    properties:
+      enableWaterMark:
+        type: boolean
+      enableWebp:
+        type: boolean
+      picgoConfig: {}
+      picgoPlugins: {}
+      storageType:
+        type: string
+      waterMarkText:
+        type: string
+    type: object
+  domain.Theme:
+    enum:
+    - auto
+    - dark
+    - light
+    type: string
+    x-enum-varnames:
+    - AutoTheme
+    - DarkTheme
+    - LightTheme
+  domain.TrueOrFalse:
+    enum:
+    - "true"
+    - "false"
+    type: string
+    x-enum-varnames:
+    - TrueString
+    - FalseString
+  domain.User:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      nickname:
+        type: string
+      password:
+        type: string
+      permissions:
+        items:
+          type: string
+        type: array
+      salt:
+        type: string
+      type:
+        type: string
+    type: object
+  domain.WalineSetting:
+    properties:
+      email:
+        type: string
+      forceLoginComment:
+        type: boolean
+      smtp.enabled:
+        type: boolean
+    type: object
+  svr.TokenUser:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/domain.User'
+    type: object
+info:
+  contact: {}
+paths:
+  /api/admin/analysis:
+    get:
+      consumes:
+      - application/json
+      description: statistic home page data
+      parameters:
+      - description: tab
+        enum:
+        - overview
+        - viewer
+        - article
+        in: query
+        name: tab
+        required: true
+        type: string
+      - description: overviewDataNum
+        in: query
+        name: viewerDataNum
+        type: integer
+      - description: overviewDataNum
+        in: query
+        name: overviewDataNum
+        type: integer
+      - description: articleTabDataNum
+        in: query
+        name: articleTabDataNum
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: 获取首页统计数据
+      tags:
+      - Analysis
+  /api/admin/article:
+    get:
+      consumes:
+      - application/json
+      description: from option obtain articles
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: integer
+      - description: toListView
+        in: query
+        name: toListView
+        type: boolean
+      - description: category
+        in: query
+        name: category
+        type: string
+      - description: page
+        in: query
+        name: tags
+        type: string
+      - description: title
+        in: query
+        name: title
+        type: integer
+      - description: sortCreateAt
+        in: query
+        name: sortCreateAt
+        type: integer
+      - description: sortTop
+        in: query
+        name: sortTop
+        type: integer
+      - description: sortViewer
+        in: query
+        name: sortViewer
+        type: integer
+      - description: startTime
+        in: query
+        name: startTime
+        type: integer
+      - description: endTime
+        in: query
+        name: endTime
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ArticlePageResult'
+      summary: 根据参数获取文章
+      tags:
+      - Article
+  /api/admin/article/:id:
+    delete:
+      consumes:
+      - application/json
+      description: 删除文章
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: 删除文章
+      tags:
+      - Article
+    get:
+      consumes:
+      - application/json
+      description: 根据id获取article
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ArticlePageResult'
+      summary: 根据id获取article
+      tags:
+      - Article
+    post:
+      consumes:
+      - application/json
+      description: 创建文章
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Article'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: 创建文章
+      tags:
+      - Article
+    put:
+      consumes:
+      - application/json
+      description: 根据id获取article
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Article'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: 根据id更新文档
+      tags:
+      - Article
+  /api/admin/article/searchByLink:
+    post:
+      consumes:
+      - application/json
+      description: 根据link获取文章集合
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Article'
+      summary: 根据link获取文章集合
+      tags:
+      - Article
+  /api/admin/auth:
+    put:
+      consumes:
+      - application/json
+      description: 更新用户
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: bool
+      summary: 更新用户
+      tags:
+      - Auth
+  /api/admin/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: login by username and password
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: password
+        in: path
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/svr.TokenUser'
+      summary: 登陆
+      tags:
+      - Auth
+  /api/admin/auth/logout:
+    get:
+      consumes:
+      - application/json
+      description: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: bool
+      summary: 登出
+      tags:
+      - Auth
+  /api/admin/auth/restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: bool
+      summary: 恢复密钥
+      tags:
+      - Auth
+  /api/admin/backup/export:
+    get:
+      consumes:
+      - application/json
+      description: 导出系统数据
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: 导出系统数据
+      tags:
+      - Backup
+  /api/admin/backup/import:
+    post:
+      consumes:
+      - application/json
+      description: 导入系统数据
+      parameters:
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: 导入系统数据
+      tags:
+      - Backup
+  /api/admin/caddy/ask:
+    get:
+      consumes:
+      - application/json
+      description: acquire https settings
+      parameters:
+      - description: domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: acquire https settings
+      tags:
+      - Caddy
+  /api/admin/caddy/config:
+    get:
+      consumes:
+      - application/json
+      description: get caddy config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: get caddy config
+      tags:
+      - Caddy
+  /api/admin/caddy/https:
+    get:
+      consumes:
+      - application/json
+      description: acquire https settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.HttpSetting'
+      summary: acquire https settings
+      tags:
+      - Caddy
+    put:
+      consumes:
+      - application/json
+      description: update https settings
+      parameters:
+      - description: httpsSettingCredential
+        in: body
+        name: httpsSettingCredential
+        required: true
+        schema:
+          $ref: '#/definitions/credential.HttpsSettingCredential'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update https settings
+      tags:
+      - Caddy
+  /api/admin/caddy/log:
+    delete:
+      consumes:
+      - application/json
+      description: clear caddy log
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: clear caddy log
+      tags:
+      - Caddy
+    get:
+      consumes:
+      - application/json
+      description: get caddy log
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: get caddy log
+      tags:
+      - Caddy
+  /api/admin/category:
+    post:
+      consumes:
+      - application/json
+      description: create category
+      parameters:
+      - description: credential
+        in: body
+        name: credential
+        required: true
+        schema:
+          $ref: '#/definitions/credential.CategoryCredential'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: create category
+      tags:
+      - Category
+  /api/admin/category/:name:
+    delete:
+      consumes:
+      - application/json
+      description: delete category by category name
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete category by category name
+      tags:
+      - Category
+    get:
+      consumes:
+      - application/json
+      description: get articles by category name
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Article'
+            type: array
+      summary: get articles by category name
+      tags:
+      - Category
+    put:
+      consumes:
+      - application/json
+      description: delete category by category name
+      parameters:
+      - description: credential
+        in: body
+        name: credential
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update category by category name
+      tags:
+      - Category
+  /api/admin/category/all:
+    get:
+      consumes:
+      - application/json
+      description: get all category tags
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: get all category tags
+      tags:
+      - Category
+  /api/admin/collaborator:
+    get:
+      consumes:
+      - application/json
+      description: get all collaborator
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.User'
+            type: array
+      summary: get all collaborator
+      tags:
+      - Collaborator
+    post:
+      consumes:
+      - application/json
+      description: create collaborator
+      parameters:
+      - description: user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: create collaborator
+      tags:
+      - Collaborator
+    put:
+      consumes:
+      - application/json
+      description: update collaborator
+      parameters:
+      - description: user
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update collaborator
+      tags:
+      - Collaborator
+  /api/admin/collaborator/:id:
+    delete:
+      consumes:
+      - application/json
+      description: delete collaborator by id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete collaborator by id
+      tags:
+      - Collaborator
+  /api/admin/collaborator/list:
+    get:
+      consumes:
+      - application/json
+      description: get all collaborator of list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.User'
+            type: array
+      summary: get all collaborator of list
+      tags:
+      - Collaborator
+  /api/admin/draft:
+    get:
+      consumes:
+      - application/json
+      description: get drafts by options
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: integer
+      - description: toListView
+        in: query
+        name: toListView
+        type: boolean
+      - description: category
+        in: query
+        name: category
+        type: string
+      - description: page
+        in: query
+        name: tags
+        type: string
+      - description: title
+        in: query
+        name: title
+        type: integer
+      - description: sortCreateAt
+        in: query
+        name: sortCreateAt
+        type: integer
+      - description: startTime
+        in: query
+        name: startTime
+        type: integer
+      - description: endTime
+        in: query
+        name: endTime
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.DraftPageResult'
+      summary: get drafts by options
+      tags:
+      - Draft
+    post:
+      consumes:
+      - application/json
+      description: crate draft
+      parameters:
+      - description: draft
+        in: body
+        name: draft
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Draft'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Draft'
+      summary: crate draft
+      tags:
+      - Draft
+  /api/admin/draft/:id:
+    delete:
+      consumes:
+      - application/json
+      description: crate draft
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete draft by id
+      tags:
+      - Draft
+    get:
+      consumes:
+      - application/json
+      description: get draft by id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Draft'
+      summary: get draft by id
+      tags:
+      - Draft
+    put:
+      consumes:
+      - application/json
+      description: update draft by id
+      parameters:
+      - description: draft
+        in: body
+        name: draft
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Draft'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update draft by id
+      tags:
+      - Draft
+  /api/admin/draft/publish/:id:
+    post:
+      consumes:
+      - application/json
+      description: publish and update draft
+      parameters:
+      - description: draft
+        in: body
+        name: draft
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Draft'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Draft'
+      summary: publish and update draft
+      tags:
+      - Draft
+  /api/admin/meta:
+    get:
+      consumes:
+      - application/json
+      description: get meta info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/credential.MetaCredential'
+      summary: get meta info
+      tags:
+      - Meta
+  /api/admin/meta/about:
+    get:
+      consumes:
+      - application/json
+      description: obtain about information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Meta'
+      summary: 获取About
+      tags:
+      - Meta
+    put:
+      consumes:
+      - application/json
+      description: obtain about information
+      parameters:
+      - description: content
+        in: path
+        name: content
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: 更新 about
+      tags:
+      - Meta
+  /api/admin/meta/link:
+    get:
+      consumes:
+      - application/json
+      description: get link by meta
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.LinkItem'
+            type: array
+      summary: get link by meta
+      tags:
+      - Link
+    post:
+      consumes:
+      - application/json
+      description: create link
+      parameters:
+      - description: link
+        in: body
+        name: link
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LinkItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: create link
+      tags:
+      - Link
+    put:
+      consumes:
+      - application/json
+      description: update link
+      parameters:
+      - description: link
+        in: body
+        name: link
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LinkItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update link
+      tags:
+      - Link
+  /api/admin/meta/link/:name:
+    delete:
+      consumes:
+      - application/json
+      description: delete link by link name
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete link by link name
+      tags:
+      - Link
+  /api/admin/meta/menu:
+    get:
+      consumes:
+      - application/json
+      description: get menu by settings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.MenuItem'
+            type: array
+      summary: get menu by settings
+      tags:
+      - Menu
+    put:
+      consumes:
+      - application/json
+      description: update menu
+      parameters:
+      - description: menu
+        in: body
+        name: menu
+        required: true
+        schema:
+          $ref: '#/definitions/domain.MenuItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update menu
+      tags:
+      - Menu
+  /api/admin/meta/reward:
+    get:
+      consumes:
+      - application/json
+      description: get reward list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.RewardItem'
+            type: array
+      summary: get reward list
+      tags:
+      - Reward
+    post:
+      consumes:
+      - application/json
+      description: create reward
+      parameters:
+      - description: reward
+        in: body
+        name: reward
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RewardItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: create reward
+      tags:
+      - Reward
+    put:
+      consumes:
+      - application/json
+      description: update reward
+      parameters:
+      - description: reward
+        in: body
+        name: reward
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RewardItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update reward
+      tags:
+      - Reward
+  /api/admin/meta/reward/:name:
+    delete:
+      consumes:
+      - application/json
+      description: delete reward by reward name
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete reward by reward name
+      tags:
+      - Reward
+  /api/admin/meta/site:
+    get:
+      consumes:
+      - application/json
+      description: get site
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.SiteInfo'
+      summary: get site
+      tags:
+      - Site
+    put:
+      consumes:
+      - application/json
+      description: update site info
+      parameters:
+      - description: site
+        in: body
+        name: site
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SiteInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update site info
+      tags:
+      - Site
+  /api/admin/meta/social:
+    get:
+      consumes:
+      - application/json
+      description: get socials
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.SocialItem'
+            type: array
+      summary: get socials
+      tags:
+      - Social
+    post:
+      consumes:
+      - application/json
+      description: create social
+      parameters:
+      - description: social
+        in: body
+        name: social
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SocialItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: create social
+      tags:
+      - Social
+    put:
+      consumes:
+      - application/json
+      description: update social
+      parameters:
+      - description: social
+        in: body
+        name: social
+        required: true
+        schema:
+          $ref: '#/definitions/domain.SocialItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update social
+      tags:
+      - Social
+  /api/admin/meta/social/:type:
+    delete:
+      consumes:
+      - application/json
+      description: delete social by type name
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete social by type name
+      tags:
+      - Social
+  /api/admin/meta/social/types:
+    get:
+      consumes:
+      - application/json
+      description: get socials
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.SocialItem'
+            type: array
+      summary: get socials
+      tags:
+      - Social
+  /api/admin/setting/layout:
+    get:
+      consumes:
+      - application/json
+      description: get layout setting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.LayoutSetting'
+      summary: get layout setting
+      tags:
+      - Setting
+    put:
+      consumes:
+      - application/json
+      description: save or update layout setting
+      parameters:
+      - description: layout
+        in: body
+        name: layout
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LayoutSetting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: save or update layout setting
+      tags:
+      - Setting
+  /api/admin/setting/login:
+    get:
+      consumes:
+      - application/json
+      description: get login setting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.LoginSetting'
+      summary: get login setting
+      tags:
+      - Setting
+    put:
+      consumes:
+      - application/json
+      description: save or update login setting
+      parameters:
+      - description: login
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginSetting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: save or update login setting
+      tags:
+      - Setting
+  /api/admin/setting/static:
+    get:
+      consumes:
+      - application/json
+      description: get static setting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.StaticSetting'
+      summary: get static setting
+      tags:
+      - Setting
+    put:
+      consumes:
+      - application/json
+      description: save or update static setting
+      parameters:
+      - description: static
+        in: body
+        name: static
+        required: true
+        schema:
+          $ref: '#/definitions/domain.StaticSetting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: save or update static setting
+      tags:
+      - Setting
+  /api/admin/setting/waline:
+    get:
+      consumes:
+      - application/json
+      description: get waline setting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.WalineSetting'
+      summary: get waline setting
+      tags:
+      - Setting
+    put:
+      consumes:
+      - application/json
+      description: save or update waline setting
+      parameters:
+      - description: waline
+        in: body
+        name: waline
+        required: true
+        schema:
+          $ref: '#/definitions/domain.WalineSetting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: save or update waline setting
+      tags:
+      - Setting
+  /api/admin/user/list:
+    get:
+      consumes:
+      - application/json
+      description: obtain user list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.User'
+      summary: 获取用户列表
+      tags:
+      - User
+swagger: "2.0"
