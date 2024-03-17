@@ -5,6 +5,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
+	"cc.allio/fusion/pkg/utils"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/exp/slog"
@@ -91,5 +92,28 @@ func (v *ViewerService) GetViewerGrid(num int64) *domain.ViewerGrid {
 			Viewer:  today.Viewer,
 			Visited: today.Visited,
 		},
+	}
+}
+
+func (v *ViewerService) SaveOrUpdateViewer(dateViewer *domain.DateViewer) (bool, error) {
+	viewer, err := v.ViewerRepo.FindOne(mongodb.NewLogicalDefault(bson.E{Key: "date", Value: dateViewer.Date}))
+	if err != nil {
+		return false, nil
+	}
+	if viewer != nil {
+		value := utils.ToBsonElements(dateViewer)
+		return v.ViewerRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: viewer.Id}), value)
+	} else {
+		view := &domain.Viewer{
+			Date:      dateViewer.Date,
+			Viewer:    dateViewer.Viewer,
+			Visited:   dateViewer.Visited,
+			CreatedAt: time.Now(),
+		}
+		saved, err := v.ViewerRepo.Save(view)
+		if err != nil {
+			return false, err
+		}
+		return saved > 0, err
 	}
 }

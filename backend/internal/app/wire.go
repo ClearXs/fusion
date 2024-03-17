@@ -6,6 +6,7 @@ package app
 import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/app/router"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/mongodb"
@@ -21,6 +22,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		repo.RepositorySet,
 		svr.ServiceSet,
 		router.Set,
+		event.IsrEventBusSet,
 	))
 }
 

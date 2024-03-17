@@ -4,6 +4,7 @@ import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/credential"
 	"cc.allio/fusion/internal/domain"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/web"
 	"errors"
@@ -16,6 +17,7 @@ const ArticlePathPrefix = "/api/admin/article"
 type ArticleRouter struct {
 	Cfg        *config.Config
 	ArticleSvr *svr.ArticleService
+	Isr        *event.IsrEventBus
 }
 
 var ArticleRouterSet = wire.NewSet(wire.Struct(new(ArticleRouter), "*"))
@@ -40,7 +42,7 @@ var ArticleRouterSet = wire.NewSet(wire.Struct(new(ArticleRouter), "*"))
 // @Param        endTime            query      int        false       "endTime"
 // @Success 200 {object} domain.ArticlePageResult
 // @Router /api/admin/article [Get]
-func (router *ArticleRouter) GetArticleByOption(c *gin.Context) *R {
+func (a *ArticleRouter) GetArticleByOption(c *gin.Context) *R {
 	page := web.ParseNumberForQuery(c, "page", -1)
 	pageSize := web.ParseNumberForQuery(c, "pageSize", 5)
 	toListView := web.ParseBoolForQuery(c, "toListView", false)
@@ -65,7 +67,7 @@ func (router *ArticleRouter) GetArticleByOption(c *gin.Context) *R {
 		StartTime:     startTime,
 		EndTime:       endTime,
 	}
-	result := router.ArticleSvr.GetByOption(option, false)
+	result := a.ArticleSvr.GetByOption(option, false)
 	return Ok(result)
 }
 
@@ -78,9 +80,9 @@ func (router *ArticleRouter) GetArticleByOption(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.ArticlePageResult
 // @Router /api/admin/article/:id [Get]
-func (router *ArticleRouter) GetOneById(c *gin.Context) *R {
+func (a *ArticleRouter) GetOneById(c *gin.Context) *R {
 	id := web.ParseNumberForPath(c, "id", -1)
-	article := router.ArticleSvr.GetById(int64(id))
+	article := a.ArticleSvr.GetById(int64(id))
 	return Ok(article)
 }
 
@@ -94,8 +96,8 @@ func (router *ArticleRouter) GetOneById(c *gin.Context) *R {
 // @Param       request     body      domain.Article   true     "query params"
 // @Success 200 {object} bool
 // @Router /api/admin/article/:id [PUT]
-func (router *ArticleRouter) UpdateArticleById(c *gin.Context) *R {
-	if router.Cfg.Demo {
+func (a *ArticleRouter) UpdateArticleById(c *gin.Context) *R {
+	if a.Cfg.Demo {
 		return Error(401, errors.New("演示站禁止修改文章！！"))
 	}
 	var article = &domain.Article{}
@@ -104,7 +106,9 @@ func (router *ArticleRouter) UpdateArticleById(c *gin.Context) *R {
 		return InternalError(err)
 	}
 	id := web.ParseNumberForPath(c, "id", -1)
-	updated := router.ArticleSvr.UpdateById(int64(id), article)
+	updated := a.ArticleSvr.UpdateById(int64(id), article)
+
+	a.Isr.ActiveAll("trigger incremental rendering by update article", article)
 	return Ok(updated)
 }
 
@@ -118,8 +122,8 @@ func (router *ArticleRouter) UpdateArticleById(c *gin.Context) *R {
 // @Param       request     body      domain.Article   true     "query params"
 // @Success 200 {object} bool
 // @Router /api/admin/article/:id [POST]
-func (router *ArticleRouter) CreateArticle(c *gin.Context) *R {
-	if router.Cfg.Demo {
+func (a *ArticleRouter) CreateArticle(c *gin.Context) *R {
+	if a.Cfg.Demo {
 		return Error(401, errors.New("演示站禁止创建文章！！"))
 	}
 	var article = &domain.Article{}
@@ -127,10 +131,11 @@ func (router *ArticleRouter) CreateArticle(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
-	create, err := router.ArticleSvr.Create(article)
+	create, err := a.ArticleSvr.Create(article)
 	if err != nil {
 		return InternalError(err)
 	}
+	a.Isr.ActiveAll("trigger incremental rendering by create article", article)
 	return Ok(create)
 }
 
@@ -143,12 +148,13 @@ func (router *ArticleRouter) CreateArticle(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/article/:id [DELETE]
-func (router *ArticleRouter) DeleteArticle(c *gin.Context) *R {
-	if router.Cfg.Demo {
+func (a *ArticleRouter) DeleteArticle(c *gin.Context) *R {
+	if a.Cfg.Demo {
 		return Error(401, errors.New("演示站禁止删除文章！！！"))
 	}
 	id := web.ParseNumberForPath(c, "id", -1)
-	deleted := router.ArticleSvr.DeleteById(int64(id))
+	deleted := a.ArticleSvr.DeleteById(int64(id))
+	a.Isr.ActiveAll("trigger incremental rendering by delete article", id)
 	return Ok(deleted)
 }
 
@@ -161,21 +167,21 @@ func (router *ArticleRouter) DeleteArticle(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.Article
 // @Router /api/admin/article/searchByLink [POST]
-func (router *ArticleRouter) GetArticlesByLink(c *gin.Context) *R {
+func (a *ArticleRouter) GetArticlesByLink(c *gin.Context) *R {
 	var searchArticleLink = &credential.ArticleSearchLinkCredential{}
 	err := c.Bind(searchArticleLink)
 	if err != nil {
 		return InternalError(err)
 	}
-	articles := router.ArticleSvr.GetByLink(searchArticleLink.Link)
+	articles := a.ArticleSvr.GetByLink(searchArticleLink.Link)
 	return Ok(articles)
 }
 
-func (router *ArticleRouter) Register(r *gin.Engine) {
-	r.GET(ArticlePathPrefix, Handle(router.GetArticleByOption))
-	r.GET(ArticlePathPrefix+"/:id", Handle(router.GetOneById))
-	r.PUT(ArticlePathPrefix+"/:id", Handle(router.UpdateArticleById))
-	r.POST(ArticlePathPrefix+"", Handle(router.CreateArticle))
-	r.DELETE(ArticlePathPrefix+"/:id", Handle(router.DeleteArticle))
-	r.POST(ArticlePathPrefix+"/searchByLink", Handle(router.GetArticlesByLink))
+func (a *ArticleRouter) Register(r *gin.Engine) {
+	r.GET(ArticlePathPrefix, Handle(a.GetArticleByOption))
+	r.GET(ArticlePathPrefix+"/:id", Handle(a.GetOneById))
+	r.PUT(ArticlePathPrefix+"/:id", Handle(a.UpdateArticleById))
+	r.POST(ArticlePathPrefix+"", Handle(a.CreateArticle))
+	r.DELETE(ArticlePathPrefix+"/:id", Handle(a.DeleteArticle))
+	r.POST(ArticlePathPrefix+"/searchByLink", Handle(a.GetArticlesByLink))
 }

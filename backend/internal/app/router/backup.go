@@ -38,46 +38,46 @@ var BackupRouterSet = wire.NewSet(wire.Struct(new(BackupRouter), "*"))
 // @Produce json
 // @Success 200 {object} nil
 // @Router /api/admin/backup/export [Get]
-func (router *BackupRouter) ExportBackup(c *gin.Context) *R {
+func (a *BackupRouter) ExportBackup(c *gin.Context) *R {
 	backup := &Backup{}
 	{
-		articles := router.ArticleSvr.GetAll("admin", true, false)
+		articles := a.ArticleSvr.GetAll("admin", true, false)
 		backup.Articles = articles
 	}
 	{
-		categories := router.CategorySvr.GetAllCategories()
+		categories := a.CategorySvr.GetAllCategories()
 		backup.Categories = categories
 	}
 	{
-		tags := router.TagSvr.GetAllTags(true)
+		tags := a.TagSvr.GetAllTags(true)
 		backup.Tags = tags
 	}
 	{
-		meta := router.MetaSvr.GetMeta()
+		meta := a.MetaSvr.GetMeta()
 		backup.Meta = meta
 	}
 	{
-		drafts := router.DraftSvr.GetAll()
+		drafts := a.DraftSvr.GetAll()
 		backup.Drafts = drafts
 	}
 	{
-		user := router.UserSvr.GetUser()
+		user := a.UserSvr.GetUser()
 		backup.User = user
 	}
 	{
-		viewers := router.ViewerSvr.GetAll()
+		viewers := a.ViewerSvr.GetAll()
 		backup.Viewers = viewers
 	}
 	{
-		visits := router.VisitSvr.GetAll()
+		visits := a.VisitSvr.GetAll()
 		backup.Visits = visits
 	}
 	{
-		statics := router.StaticSvr.GetAll()
+		statics := a.StaticSvr.GetAll()
 		backup.Static = statics
 	}
 	{
-		staticSetting := router.SettingSvr.FindStaticSetting()
+		staticSetting := a.SettingSvr.FindStaticSetting()
 		backup.Setting.Static = staticSetting
 	}
 	jsonBytes, err := json.Marshal(backup)
@@ -106,7 +106,7 @@ func (router *BackupRouter) ExportBackup(c *gin.Context) *R {
 // @Param        file              formData      file        true       "file"
 // @Success 200 {object} nil
 // @Router /api/admin/backup/import [Post]
-func (router *BackupRouter) ImportBackup(c *gin.Context) *R {
+func (a *BackupRouter) ImportBackup(c *gin.Context) *R {
 	filePart, err := c.FormFile("file")
 	if err != nil {
 		return InternalError(err)
@@ -128,9 +128,9 @@ func (router *BackupRouter) ImportBackup(c *gin.Context) *R {
 	return nil
 }
 
-func (router *BackupRouter) Register(r *gin.Engine) {
-	r.GET(BackupPathPrefix+"/export", Handle(router.ExportBackup))
-	r.POST(BackupPathPrefix+"/import", Handle(router.ImportBackup))
+func (a *BackupRouter) Register(r *gin.Engine) {
+	r.GET(BackupPathPrefix+"/export", Handle(a.ExportBackup))
+	r.POST(BackupPathPrefix+"/import", Handle(a.ImportBackup))
 }
 
 type Backup struct {

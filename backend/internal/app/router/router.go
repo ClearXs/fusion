@@ -34,6 +34,7 @@ type Router struct {
 	SocialRouter       *SocialRouter
 	TagRouter          *TagRouter
 	TokenRouter        *TokenRouter
+	PublicRouter       *PublicRouter
 }
 
 var Set = wire.NewSet(
@@ -57,6 +58,7 @@ var Set = wire.NewSet(
 	SocialRouterSet,
 	TagRouterSet,
 	TokenRouterSet,
+	PublicRouterSet,
 	wire.Struct(new(Router), "*"),
 )
 
@@ -93,6 +95,7 @@ func (router *Router) Init(r *gin.Engine) {
 		router.SocialRouter.Register(r)
 		router.TagRouter.Register(r)
 		router.TokenRouter.Register(r)
+		router.PublicRouter.Register(r)
 	}
 
 	// route or method not found

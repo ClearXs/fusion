@@ -3,9 +3,9 @@ package app
 import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/app/router"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/internal/svr"
-	"github.com/asaskevich/EventBus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -15,7 +15,7 @@ type App struct {
 	Svr        *svr.Service
 	Repository *repo.Repository
 	Database   *mongo.Database
-	Bus        *EventBus.EventBus
+	Isr        *event.IsrEventBus
 }
 
 func New(
@@ -24,6 +24,7 @@ func New(
 	svr *svr.Service,
 	repository *repo.Repository,
 	database *mongo.Database,
+	isr *event.IsrEventBus,
 ) *App {
 	return &App{
 		Cfg:        cfg,
@@ -31,5 +32,6 @@ func New(
 		Router:     router,
 		Repository: repository,
 		Database:   database,
+		Isr:        isr,
 	}
 }

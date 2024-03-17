@@ -4,6 +4,7 @@ import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/credential"
 	"cc.allio/fusion/internal/domain"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/web"
 	"errors"
@@ -17,6 +18,7 @@ const CategoryPathPrefix = "/api/admin/category"
 type CategoryRouter struct {
 	Cfg             *config.Config
 	CategoryService *svr.CategoryService
+	Isr             *event.IsrEventBus
 }
 
 var CategoryRouterSet = wire.NewSet(wire.Struct(new(CategoryRouter), "*"))
@@ -78,6 +80,7 @@ func (category *CategoryRouter) CreateCategory(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	category.Isr.ActiveAll("trigger incremental rendering by create category")
 	return Ok(successed)
 }
 
@@ -102,6 +105,7 @@ func (category *CategoryRouter) DeleteCategory(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	category.Isr.ActiveAll("trigger incremental rendering by delete category")
 	return Ok(removed)
 }
 
@@ -127,6 +131,7 @@ func (category *CategoryRouter) UpdateCategory(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	category.Isr.ActiveAll("trigger incremental rendering by update category")
 	return Ok(updated)
 }
 

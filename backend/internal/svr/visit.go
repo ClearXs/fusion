@@ -9,11 +9,13 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/exp/slog"
+	"strconv"
 )
 
 type VisitService struct {
-	Cfg       *config.Config
-	VisitRepo *repo.VisitRepository
+	Cfg            *config.Config
+	VisitRepo      *repo.VisitRepository
+	ArticleService *ArticleService
 }
 
 var VisitServiceSet = wire.NewSet(wire.Struct(new(VisitService), "*"))
@@ -39,4 +41,19 @@ func (v *VisitService) GetLastVisitItem() *domain.Visit {
 		return visits[0]
 	}
 	return nil
+}
+
+func (v *VisitService) GetByArticleIdOrPathname(idOrPathname string) *domain.Visit {
+	id, err := strconv.Atoi(idOrPathname)
+	var pathname string
+	if err != nil || id == 0 {
+		pathname = "/about"
+	} else if err == nil {
+		pathname = "/post/" + string(rune(id))
+	}
+	visit, err := v.VisitRepo.FindOne(mongodb.NewLogicalDefault(bson.E{Key: "pathname", Value: pathname}))
+	if err != nil {
+		return nil
+	}
+	return visit
 }

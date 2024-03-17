@@ -28,6 +28,12 @@ func ParseNumberForPath(c *gin.Context, param string, orElse int) int {
 	return utils.ToStringInt(value, orElse)
 }
 
+// ParseBoolForPath 从Get请求的路径中获取参数并转换为bool
+func ParseBoolForPath(c *gin.Context, param string) bool {
+	value := c.Param(param)
+	return utils.ToStringBool(value)
+}
+
 // ReadMultipartFile read specific multipart file then close file
 func ReadMultipartFile(file multipart.File) ([]byte, error) {
 	body, err := io.ReadAll(file)

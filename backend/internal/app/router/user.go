@@ -25,11 +25,11 @@ var UserRouterSet = wire.NewSet(wire.Struct(new(UserRouter), "*"))
 // @Produce json
 // @Success 200 {object} domain.User
 // @Router /api/admin/user/list [Get]
-func (router *UserRouter) GetUserList(c *gin.Context) *R {
-	userList := router.UserSvr.GetUserList()
+func (u *UserRouter) GetUserList(c *gin.Context) *R {
+	userList := u.UserSvr.GetUserList()
 	return Ok(userList)
 }
 
-func (router *UserRouter) Register(r *gin.Engine) {
-	r.GET(UserPrefix+"/list", Handle(router.GetUserList))
+func (u *UserRouter) Register(r *gin.Engine) {
+	r.GET(UserPrefix+"/list", Handle(u.GetUserList))
 }

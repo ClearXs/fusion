@@ -17,7 +17,7 @@ type TagService struct {
 var TagServiceSet = wire.NewSet(wire.Struct(new(TagService), "*"))
 
 func (t *TagService) GetColumnData(topNum int64, includeHidden bool) []*domain.TypeValue[int64] {
-	data := t.getTagsWithArticle(includeHidden)
+	data := t.GetTagsWithArticle(includeHidden)
 	tags := make([]string, len(data))
 	for key := range data {
 		tags = append(tags, key)
@@ -36,7 +36,7 @@ func (t *TagService) GetColumnData(topNum int64, includeHidden bool) []*domain.T
 }
 
 func (t *TagService) GetAllTags(includeHidden bool) []string {
-	allArticles := t.getTagsWithArticle(includeHidden)
+	allArticles := t.GetTagsWithArticle(includeHidden)
 	tags := make([]string, 0)
 	for k, _ := range allArticles {
 		tags = append(tags, k)
@@ -45,11 +45,11 @@ func (t *TagService) GetAllTags(includeHidden bool) []string {
 }
 
 func (t *TagService) GetArticlesByTagName(tagName string, includeHidden bool) []*domain.Article {
-	allArticles := t.getTagsWithArticle(includeHidden)
+	allArticles := t.GetTagsWithArticle(includeHidden)
 	return allArticles[tagName]
 }
 
-func (t *TagService) getTagsWithArticle(includeHidden bool) map[string][]*domain.Article {
+func (t *TagService) GetTagsWithArticle(includeHidden bool) map[string][]*domain.Article {
 	allArticles := t.ArticleSvr.GetAll("list", includeHidden, false)
 	data := make(map[string][]*domain.Article)
 	for _, article := range allArticles {

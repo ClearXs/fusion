@@ -4,6 +4,7 @@ import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/credential"
 	"cc.allio/fusion/internal/domain"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/web"
 	"errors"
@@ -17,6 +18,7 @@ const DraftPathPrefix = "/api/admin/draft"
 type DraftRouter struct {
 	Cfg          *config.Config
 	DraftService *svr.DraftService
+	Isr          *event.IsrEventBus
 }
 
 var DraftRouterSet = wire.NewSet(wire.Struct(new(DraftRouter), "*"))
@@ -168,6 +170,7 @@ func (d *DraftRouter) PublishDraft(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	d.Isr.ActiveAll("trigger incremental rendering by public draft")
 	return Ok(newDraft)
 }
 

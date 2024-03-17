@@ -22,6 +22,7 @@ const (
 	DraftCollection      = "drafts"
 	StaticCollection     = "statics"
 	CustomPageCollection = "custompages"
+	PipelineCollection   = "pipelines"
 )
 
 type Repository struct {
@@ -36,6 +37,7 @@ type Repository struct {
 	ViewerRepository     *ViewerRepository
 	VisitRepository      *VisitRepository
 	CustomPageRepository *CustomPageRepository
+	PipelineRepository   *PipelineRepository
 }
 
 var RepositorySet = wire.NewSet(
@@ -50,6 +52,7 @@ var RepositorySet = wire.NewSet(
 	ViewerRepositorySet,
 	VisitRepositorySet,
 	CustomPageRepositorySet,
+	PipelineRepositorySet,
 	wire.Struct(new(Repository), "*"),
 )
 

@@ -9,11 +9,13 @@ import (
 var (
 	Version            string
 	FusionAllowDomains string
+	WebSiteUrl         string
 )
 
 func Init() {
 	Version = GetEnv("FUSION_VERSION", "")
 	FusionAllowDomains = GetEnv("FUSION_ALLOW_DOMAINS", "")
+	WebSiteUrl = GetEnv("WEB_SITE_URL", "http://127.0.0.1:3001/api/revalidate")
 }
 
 // GetEnv get os env

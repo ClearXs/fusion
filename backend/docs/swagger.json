@@ -1846,6 +1846,190 @@
                 }
             }
         },
+        "/api/admin/tag/:name": {
+            "get": {
+                "description": "get articles by tag name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tag"
+                ],
+                "summary": "get articles by tag name",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Article"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update articles by tag name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tag"
+                ],
+                "summary": "update articles tags by tag name",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "value",
+                        "name": "value",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete articles tags by tag name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tag"
+                ],
+                "summary": "delete articles tags by tag name",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/tag/all": {
+            "get": {
+                "description": "get all tags",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tag"
+                ],
+                "summary": "get all tags",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/token": {
+            "get": {
+                "description": "get all tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Token"
+                ],
+                "summary": "get all tokens",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Token"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Token"
+                ],
+                "summary": "create token",
+                "parameters": [
+                    {
+                        "description": "tokenCredential",
+                        "name": "tokenCredential",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/credential.TokenCredential"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/token/:id": {
+            "delete": {
+                "description": "delete token by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Token"
+                ],
+                "summary": "delete token by id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/user/list": {
             "get": {
                 "description": "obtain user list",
@@ -1868,9 +2052,434 @@
                     }
                 }
             }
+        },
+        "/api/public/article": {
+            "get": {
+                "description": "from option obtain articles",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "根据参数获取文章",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "pageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "toListView",
+                        "name": "toListView",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page",
+                        "name": "tags",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "title",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sortCreateAt",
+                        "name": "sortCreateAt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sortTop",
+                        "name": "sortTop",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sortViewer",
+                        "name": "sortViewer",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "startTime",
+                        "name": "startTime",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "endTime",
+                        "name": "endTime",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ArticlePageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/article/:id": {
+            "post": {
+                "description": "get article by id or pathname",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get article by id or pathname",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Article"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/article/viewer/:id": {
+            "get": {
+                "description": "get Visit by article id or pathname",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get Visit by article id or pathname",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Visit"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/category": {
+            "get": {
+                "description": "get articles by category",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get articles by category",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/customPage": {
+            "get": {
+                "description": "get custom page",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get custom page",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "path",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.CustomPage"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/customPage/all": {
+            "get": {
+                "description": "get custom page",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get custom page",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.CustomPage"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/meta": {
+            "get": {
+                "description": "get site meta",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get site meta",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/credential.SiteMeta"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/search": {
+            "get": {
+                "description": "get article by id or pathname",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get article by id or pathname",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "value",
+                        "name": "value",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Article"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/tag": {
+            "get": {
+                "description": "get articles by tag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get articles by tag",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/tag/:name": {
+            "get": {
+                "description": "get articles by tag name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get articles by tag name",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/credential.PublicArticle"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/timeline": {
+            "get": {
+                "description": "get timeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get timeline",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/public/viewer": {
+            "get": {
+                "description": "get system viewer",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "get system viewer",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.DataViewer"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "add system viewer",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "add system viewer",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "isNew",
+                        "name": "isNew",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "isNewByPath",
+                        "name": "isNewByPath",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Article"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "credential.AlternateArticle": {
+            "type": "object",
+            "properties": {
+                "article": {
+                    "$ref": "#/definitions/domain.Article"
+                },
+                "next": {
+                    "$ref": "#/definitions/domain.Article"
+                },
+                "pre": {
+                    "$ref": "#/definitions/domain.Article"
+                }
+            }
+        },
         "credential.CategoryCredential": {
             "type": "object",
             "properties": {
@@ -1913,6 +2522,128 @@
                 },
                 "user": {},
                 "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "credential.PublicArticle": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "top": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "credential.SiteMeta": {
+            "type": "object",
+            "properties": {
+                "layoutSetting": {
+                    "$ref": "#/definitions/domain.LayoutSetting"
+                },
+                "menus": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.MenuItem"
+                    }
+                },
+                "meta": {
+                    "type": "object",
+                    "properties": {
+                        "about": {
+                            "$ref": "#/definitions/domain.About"
+                        },
+                        "categories": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Category"
+                            }
+                        },
+                        "id": {
+                            "type": "integer"
+                        },
+                        "links": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.LinkItem"
+                            }
+                        },
+                        "menus": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.MenuItem"
+                            }
+                        },
+                        "rewards": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.RewardItem"
+                            }
+                        },
+                        "siteInfo": {
+                            "$ref": "#/definitions/domain.SiteInfo"
+                        },
+                        "socials": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.SocialItem"
+                            }
+                        },
+                        "totalWordCount": {
+                            "type": "integer"
+                        },
+                        "viewer": {
+                            "type": "integer"
+                        },
+                        "visited": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "totalArticles": {
+                    "type": "integer"
+                },
+                "totalWords": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "credential.TokenCredential": {
+            "type": "object",
+            "properties": {
+                "name": {
                     "type": "string"
                 }
             }
@@ -2038,6 +2769,40 @@
                 "CategoryCategoryType",
                 "ColumnCategoryType"
             ]
+        },
+        "domain.CustomPage": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "html": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.DataViewer": {
+            "type": "object",
+            "properties": {
+                "viewer": {
+                    "type": "integer"
+                },
+                "visited": {
+                    "type": "integer"
+                }
+            }
         },
         "domain.Draft": {
             "type": "object",
@@ -2438,6 +3203,32 @@
                 "LightTheme"
             ]
         },
+        "domain.Token": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "disabled": {
+                    "type": "boolean"
+                },
+                "expiresIn": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.TrueOrFalse": {
             "type": "string",
             "enum": [
@@ -2478,6 +3269,32 @@
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "domain.Visit": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastVisitedTime": {
+                    "type": "string"
+                },
+                "pathname": {
+                    "type": "string"
+                },
+                "viewer": {
+                    "type": "integer"
+                },
+                "visited": {
+                    "type": "integer"
                 }
             }
         },

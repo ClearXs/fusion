@@ -9,6 +9,7 @@ package app
 import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/app/router"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/mongodb"
@@ -27,27 +28,6 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg: cfg,
 		Db:  database,
 	}
-	metaService := &svr.MetaService{
-		Cfg:      cfg,
-		MetaRepo: metaRepository,
-	}
-	aboutRouter := &router.AboutRouter{
-		Cfg:     cfg,
-		MetaSvr: metaService,
-	}
-	articleRepository := &repo.ArticleRepository{
-		Cfg: cfg,
-		Db:  database,
-	}
-	categoryRepository := &repo.CategoryRepository{
-		Cfg: cfg,
-		Db:  database,
-	}
-	articleService := &svr.ArticleService{
-		Cfg:          cfg,
-		ArticleRepo:  articleRepository,
-		CategoryRepo: categoryRepository,
-	}
 	viewerRepository := &repo.ViewerRepository{
 		Cfg: cfg,
 		Db:  database,
@@ -60,35 +40,16 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg: cfg,
 		Db:  database,
 	}
-	visitService := &svr.VisitService{
-		Cfg:       cfg,
-		VisitRepo: visitRepository,
+	articleRepository := &repo.ArticleRepository{
+		Cfg: cfg,
+		Db:  database,
 	}
-	tagService := &svr.TagService{
-		Cfg:        cfg,
-		ArticleSvr: articleService,
-	}
-	categoryService := &svr.CategoryService{
-		Cfg:          cfg,
-		CategoryRepo: categoryRepository,
-		ArticleSvr:   articleService,
-	}
-	analysisService := &svr.AnalysisService{
-		Cfg:         cfg,
-		MetaSvr:     metaService,
-		ArticleSvr:  articleService,
-		ViewerSvr:   viewerService,
-		VisitSvr:    visitService,
-		TagSvr:      tagService,
-		CategorySvr: categoryService,
-	}
-	analysisRouter := &router.AnalysisRouter{
-		Cfg:         cfg,
-		AnalysisSvr: analysisService,
-	}
-	articleRouter := &router.ArticleRouter{
-		Cfg:        cfg,
-		ArticleSvr: articleService,
+	metaService := &svr.MetaService{
+		Cfg:           cfg,
+		MetaRepo:      metaRepository,
+		ViewerService: viewerService,
+		VisitRepo:     visitRepository,
+		ArticleRepo:   articleRepository,
 	}
 	userRepository := &repo.UserRepository{
 		Cfg: cfg,
@@ -120,11 +81,38 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		UserService:  userService,
 		TokenService: tokenService,
 	}
-	authRouter := &router.AuthRouter{
-		Cfg:      cfg,
-		AuthSvr:  authService,
-		UserSvr:  userService,
-		TokenSvr: tokenService,
+	categoryRepository := &repo.CategoryRepository{
+		Cfg: cfg,
+		Db:  database,
+	}
+	articleService := &svr.ArticleService{
+		Cfg:          cfg,
+		MetaService:  metaService,
+		ArticleRepo:  articleRepository,
+		CategoryRepo: categoryRepository,
+	}
+	visitService := &svr.VisitService{
+		Cfg:            cfg,
+		VisitRepo:      visitRepository,
+		ArticleService: articleService,
+	}
+	categoryService := &svr.CategoryService{
+		Cfg:          cfg,
+		CategoryRepo: categoryRepository,
+		ArticleSvr:   articleService,
+	}
+	tagService := &svr.TagService{
+		Cfg:        cfg,
+		ArticleSvr: articleService,
+	}
+	analysisService := &svr.AnalysisService{
+		Cfg:         cfg,
+		MetaSvr:     metaService,
+		ArticleSvr:  articleService,
+		ViewerSvr:   viewerService,
+		VisitSvr:    visitService,
+		TagSvr:      tagService,
+		CategorySvr: categoryService,
 	}
 	draftRepository := &repo.DraftRepository{
 		Cfg: cfg,
@@ -143,6 +131,60 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg:        cfg,
 		StaticRepo: staticRepository,
 	}
+	svrSettingService := svr.SettingService{
+		Cfg:         cfg,
+		SettingRepo: settingsRepository,
+	}
+	caddyService := &svr.CaddyService{
+		Cfg:             cfg,
+		SettingsService: svrSettingService,
+	}
+	customPageRepository := &repo.CustomPageRepository{
+		Cfg: cfg,
+		Db:  database,
+	}
+	customPageService := &svr.CustomPageService{
+		Cfg:                  cfg,
+		CustomPageRepository: customPageRepository,
+	}
+	service := &svr.Service{
+		UserService:       userService,
+		TokenService:      tokenService,
+		AuthService:       authService,
+		MetaService:       metaService,
+		VisitService:      visitService,
+		ViewerService:     viewerService,
+		ArticleService:    articleService,
+		CategoryService:   categoryService,
+		TagService:        tagService,
+		AnalysisService:   analysisService,
+		DraftService:      draftService,
+		SettingsService:   settingService,
+		StaticService:     staticService,
+		CaddyService:      caddyService,
+		CustomPageService: customPageService,
+	}
+	isrEventBus := event.NewIsrEventBus(service)
+	aboutRouter := &router.AboutRouter{
+		Cfg:     cfg,
+		MetaSvr: metaService,
+		Isr:     isrEventBus,
+	}
+	analysisRouter := &router.AnalysisRouter{
+		Cfg:         cfg,
+		AnalysisSvr: analysisService,
+	}
+	articleRouter := &router.ArticleRouter{
+		Cfg:        cfg,
+		ArticleSvr: articleService,
+		Isr:        isrEventBus,
+	}
+	authRouter := &router.AuthRouter{
+		Cfg:      cfg,
+		AuthSvr:  authService,
+		UserSvr:  userService,
+		TokenSvr: tokenService,
+	}
 	backupRouter := &router.BackupRouter{
 		Cfg:         cfg,
 		UserSvr:     userService,
@@ -160,14 +202,6 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg:     cfg,
 		UserSvr: userService,
 	}
-	svrSettingService := svr.SettingService{
-		Cfg:         cfg,
-		SettingRepo: settingsRepository,
-	}
-	caddyService := &svr.CaddyService{
-		Cfg:             cfg,
-		SettingsService: svrSettingService,
-	}
 	caddyRouter := &router.CaddyRouter{
 		Cfg:             cfg,
 		SettingsService: settingService,
@@ -176,6 +210,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 	categoryRouter := &router.CategoryRouter{
 		Cfg:             cfg,
 		CategoryService: categoryService,
+		Isr:             isrEventBus,
 	}
 	collaboratorRouter := &router.CollaboratorRouter{
 		Cfg:          cfg,
@@ -190,6 +225,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 	draftRouter := &router.DraftRouter{
 		Cfg:          cfg,
 		DraftService: draftService,
+		Isr:          isrEventBus,
 	}
 	linkRouter := &router.LinkRouter{
 		Cfg:         cfg,
@@ -219,6 +255,25 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg:         cfg,
 		MetaService: metaService,
 	}
+	tagRouter := &router.TagRouter{
+		Cfg:        cfg,
+		TagService: tagService,
+	}
+	tokenRouter := &router.TokenRouter{
+		Cfg:          cfg,
+		TokenService: tokenService,
+	}
+	publicRouter := &router.PublicRouter{
+		Cfg:               cfg,
+		ArticleService:    articleService,
+		TagService:        tagService,
+		MetaService:       metaService,
+		ViewerService:     viewerService,
+		VisitService:      visitService,
+		SettingService:    settingService,
+		CustomPageService: customPageService,
+		CategoryService:   categoryService,
+	}
 	routerRouter := &router.Router{
 		AboutRouter:        aboutRouter,
 		AnalysisRouter:     analysisRouter,
@@ -238,31 +293,13 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		SettingRouter:      settingRouter,
 		SiteRouter:         siteRouter,
 		SocialRouter:       socialRouter,
+		TagRouter:          tagRouter,
+		TokenRouter:        tokenRouter,
+		PublicRouter:       publicRouter,
 	}
-	customPageRepository := &repo.CustomPageRepository{
+	pipelineRepository := &repo.PipelineRepository{
 		Cfg: cfg,
 		Db:  database,
-	}
-	customPageService := &svr.CustomPageService{
-		Cfg:                  cfg,
-		CustomPageRepository: customPageRepository,
-	}
-	service := &svr.Service{
-		UserService:       userService,
-		TokenService:      tokenService,
-		AuthService:       authService,
-		MetaService:       metaService,
-		VisitService:      visitService,
-		ViewerService:     viewerService,
-		ArticleService:    articleService,
-		CategoryService:   categoryService,
-		TagService:        tagService,
-		AnalysisService:   analysisService,
-		DraftService:      draftService,
-		SettingsService:   settingService,
-		StaticService:     staticService,
-		CaddyService:      caddyService,
-		CustomPageService: customPageService,
 	}
 	repository := &repo.Repository{
 		ArticleRepository:    articleRepository,
@@ -276,8 +313,9 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		ViewerRepository:     viewerRepository,
 		VisitRepository:      visitRepository,
 		CustomPageRepository: customPageRepository,
+		PipelineRepository:   pipelineRepository,
 	}
-	app := New(cfg, routerRouter, service, repository, database)
+	app := New(cfg, routerRouter, service, repository, database, isrEventBus)
 	return app, func() {
 		cleanup()
 	}, nil

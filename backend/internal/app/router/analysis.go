@@ -30,25 +30,25 @@ var AnalysisRouterSet = wire.NewSet(wire.Struct(new(AnalysisRouter), "*"))
 // @Param        overviewDataNum    query      int         false      "overviewDataNum"
 // @Param        articleTabDataNum  query      int         false      "articleTabDataNum"
 // @Router /api/admin/analysis [Get]
-func (router *AnalysisRouter) GetWelcomePageData(c *gin.Context) *R {
+func (a *AnalysisRouter) GetWelcomePageData(c *gin.Context) *R {
 	tab := c.Query("tab")
 	if tab == "overview" {
 		viewerDataNum := web.ParseNumberForQuery(c, "viewerDataNum", 0)
-		overviewData := router.AnalysisSvr.GetOverViewTabData(int64(viewerDataNum))
+		overviewData := a.AnalysisSvr.GetOverViewTabData(int64(viewerDataNum))
 		return Ok(overviewData)
 	} else if tab == "viewer" {
 		overviewDataNum := web.ParseNumberForQuery(c, "overviewDataNum", 0)
-		viewerTabData := router.AnalysisSvr.GetViewerTabData(int64(overviewDataNum))
+		viewerTabData := a.AnalysisSvr.GetViewerTabData(int64(overviewDataNum))
 		return Ok(viewerTabData)
 	} else if tab == "article" {
 		articleTabDataNum := web.ParseNumberForQuery(c, "articleTabDataNum", 0)
-		articleTabData := router.AnalysisSvr.GetArticleTabData(int64(articleTabDataNum))
+		articleTabData := a.AnalysisSvr.GetArticleTabData(int64(articleTabDataNum))
 		return Ok(articleTabData)
 	} else {
 		return InternalError(errors.New("not found any tab view data"))
 	}
 }
 
-func (router *AnalysisRouter) Register(r *gin.Engine) {
-	r.GET(AnalysisPathPrefix, Handle(router.GetWelcomePageData))
+func (a *AnalysisRouter) Register(r *gin.Engine) {
+	r.GET(AnalysisPathPrefix, Handle(a.GetWelcomePageData))
 }

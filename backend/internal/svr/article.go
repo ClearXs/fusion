@@ -579,3 +579,46 @@ func (a *ArticleService) GetArticleByIdOrPathnameWithPassword(idOrPathname strin
 	}
 	return nil
 }
+
+func (a *ArticleService) SearchByText(text string, includeHidden bool) []*domain.Article {
+	filter := mongodb.NewLogical()
+	regexText := bson.D{{"$regex", text}, {"$options", "i"}}
+	filter.AppendLogical(mongodb.NewLogicalDefaultArray(bson.D{{"content", regexText}, {"title", regexText}, {"category", regexText}, {"tags", regexText}}))
+	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(DeleteFilter))
+	if includeHidden {
+		filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(HiddenFilter))
+	}
+	articles, err := a.ArticleRepo.FindList(filter)
+	if err != nil {
+		return make([]*domain.Article, 0)
+	}
+	return articles
+}
+
+func (a *ArticleService) UpdateViewerByPathname(pathname string, isNew bool) {
+	article := a.getArticleByIdOrPathname(pathname)
+	if article != nil {
+		oldViewer := article.Visited
+		oldVisited := article.Visited
+		newViewer := oldViewer + 1
+		newVisited := oldVisited
+		if isNew {
+			newVisited = oldVisited + 1
+		}
+		a.ArticleRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: article.Id}), bson.D{{"visited", newVisited}, {"viewer", newViewer}})
+	}
+}
+
+func (a *ArticleService) GetTimeLine() map[string][]*domain.Article {
+	filter := mongodb.NewLogical()
+	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(DeleteFilter))
+	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(HiddenFilter))
+	opt := &options.FindOptions{Sort: bson.E{Key: "createAt", Value: -1}}
+	articles, err := a.ArticleRepo.FindList(filter, opt)
+	if err != nil {
+		return map[string][]*domain.Article{}
+	}
+	return lo.GroupBy[*domain.Article, string](articles, func(article *domain.Article) string {
+		return string(rune(article.CreatedAt.Year()))
+	})
+}

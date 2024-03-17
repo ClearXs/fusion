@@ -11,12 +11,17 @@ import (
 	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/exp/slog"
+	"strconv"
+	"strings"
 	"time"
 )
 
 type MetaService struct {
-	Cfg      *config.Config
-	MetaRepo *repo.MetaRepository
+	Cfg           *config.Config
+	MetaRepo      *repo.MetaRepository
+	ViewerService *ViewerService
+	VisitRepo     *repo.VisitRepository
+	ArticleRepo   *repo.ArticleRepository
 }
 
 var MetaServiceSet = wire.NewSet(wire.Struct(new(MetaService), "*"))
@@ -181,4 +186,121 @@ func (m *MetaService) DeleteSocialByType(typeName string) (bool, error) {
 	socials := meta.Socials
 	socials = lo.Filter(socials, func(item *domain.SocialItem, index int) bool { return item.Type == typeName })
 	return m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: meta.Id}), bson.D{{"socials", socials}})
+}
+
+func (m *MetaService) AddViewer(isNew bool, pathname string, isNewByPath bool) *domain.DataViewer {
+	meta := m.GetMeta()
+	oldViewer := int64(0)
+	oldVisited := int64(0)
+	if meta != nil {
+		oldViewer = meta.Viewer
+		oldVisited = meta.Visited
+	}
+
+	newViewer := oldViewer + 1
+	newVisited := oldVisited
+	if isNew {
+		newVisited += 1
+	}
+	if meta != nil {
+		m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: meta.Id}), bson.D{{"viewer", newViewer}, {"visited", newVisited}})
+	}
+	if strings.Contains(pathname, "post") {
+		m.updateViewerByPathname(strings.ReplaceAll(pathname, "post", ""), isNew)
+	}
+	dateViewer := &domain.DateViewer{
+		Date:    time.Now().Format(time.DateOnly),
+		Viewer:  newViewer,
+		Visited: newVisited,
+	}
+	m.ViewerService.SaveOrUpdateViewer(dateViewer)
+	m.appendVisit(isNewByPath, pathname)
+
+	return &domain.DataViewer{Visited: newVisited, Viewer: newViewer}
+}
+
+func (v *MetaService) appendVisit(isNew bool, pathname string) (bool, error) {
+	now := time.Now()
+	nowFormat := now.Format(time.DateOnly)
+	todayVisit, err := v.VisitRepo.FindOne(mongodb.NewLogicalDefaultArray(bson.D{{"date", nowFormat}, {"pathname", pathname}}))
+	if err != nil {
+		return false, err
+	}
+	if todayVisit != nil {
+		visited := todayVisit.Visited
+		if isNew {
+			visited = todayVisit.Visited + 1
+		}
+		update := bson.D{{"viewer", todayVisit.Viewer + 1}, {"visited", visited}, {"lastVisitedTime", time.Now()}}
+		return v.VisitRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: todayVisit.Id}), update)
+	} else {
+		lastDay := now.AddDate(0, 0, -1)
+		lastDayFormat := lastDay.Format(time.DateOnly)
+		lastDayVisit, err := v.VisitRepo.FindOne(mongodb.NewLogicalDefaultArray(bson.D{{"date", lastDayFormat}, {"pathname", pathname}}))
+		if err != nil {
+			return false, nil
+		}
+		visited := lastDayVisit.Visited
+		if isNew {
+			visited += 1
+		}
+
+		visit := &domain.Visit{
+			Date:            nowFormat,
+			Viewer:          lastDayVisit.Viewer + 1,
+			Visited:         visited,
+			Pathname:        pathname,
+			LastVisitedTime: time.Now(),
+		}
+		saved, err := v.VisitRepo.Save(visit)
+		if err != nil {
+			return false, err
+		}
+		return saved > 0, nil
+	}
+}
+
+func (a *MetaService) updateViewerByPathname(pathname string, isNew bool) {
+	article := a.getArticleByIdOrPathname(pathname)
+	if article != nil {
+		oldViewer := article.Visited
+		oldVisited := article.Visited
+		newViewer := oldViewer + 1
+		newVisited := oldVisited
+		if isNew {
+			newVisited = oldVisited + 1
+		}
+		a.ArticleRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: article.Id}), bson.D{{"visited", newVisited}, {"viewer", newViewer}})
+	}
+}
+
+func (a *MetaService) getArticleByIdOrPathname(idOrPathname string) *domain.Article {
+	var article *domain.Article
+	id, err := strconv.Atoi(idOrPathname)
+	if err == nil {
+		article = a.getArticleById(int64(id))
+	} else {
+		article = a.getArticleByPathname(idOrPathname)
+	}
+	return article
+}
+
+func (a *MetaService) getArticleById(id int64) *domain.Article {
+	filter := mongodb.NewLogicalDefault(bson.E{Key: "id", Value: id})
+	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(DeleteFilter))
+	article, err := a.ArticleRepo.FindOne(filter)
+	if err != nil {
+		return &domain.Article{}
+	}
+	return article
+}
+
+func (a *MetaService) getArticleByPathname(pathname string) *domain.Article {
+	filter := mongodb.NewLogicalDefault(bson.E{Key: "pathname", Value: pathname})
+	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(DeleteFilter))
+	article, err := a.ArticleRepo.FindOne(filter)
+	if err != nil {
+		return &domain.Article{}
+	}
+	return article
 }

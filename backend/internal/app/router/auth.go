@@ -38,7 +38,7 @@ var AuthRouterSet = wire.NewSet(wire.Struct(new(AuthRouter), "*"))
 // @Param        password   path      string  true  "password"
 // @Success 200 {object} svr.TokenUser
 // @Router /api/admin/auth/login [Post]
-func (router *AuthRouter) Login(c *gin.Context) *R {
+func (r *AuthRouter) Login(c *gin.Context) *R {
 	ip := utils.GetIpByRequest(c.Request)
 	slog.Info("ip %s", ip)
 	var loginCredential credential.LoginCredential
@@ -46,7 +46,7 @@ func (router *AuthRouter) Login(c *gin.Context) *R {
 	if err != nil {
 		return AuthenticationError(err)
 	}
-	tokenUser, err := router.AuthSvr.Login(loginCredential.Username, loginCredential.Password)
+	tokenUser, err := r.AuthSvr.Login(loginCredential.Username, loginCredential.Password)
 	if err != nil {
 		return AuthenticationError(err)
 	}
@@ -61,12 +61,12 @@ func (router *AuthRouter) Login(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {bool} bool
 // @Router /api/admin/auth/logout [GET]
-func (router *AuthRouter) Logout(c *gin.Context) *R {
+func (r *AuthRouter) Logout(c *gin.Context) *R {
 	token := c.GetHeader("token")
 	if lo.IsEmpty(token) {
 		return AuthenticationError(errors.New("无登录凭证"))
 	}
-	succeed, err := router.TokenSvr.DisabledToken(token)
+	succeed, err := r.TokenSvr.DisabledToken(token)
 	if err != nil {
 		return InternalError(err)
 	}
@@ -85,7 +85,7 @@ func (router *AuthRouter) Logout(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {bool} bool
 // @Router /api/admin/auth/restore [POST]
-func (router *AuthRouter) Restore(c *gin.Context) *R {
+func (r *AuthRouter) Restore(c *gin.Context) *R {
 	var restoreCredential credential.RestoreCredential
 	err := c.ShouldBind(&restoreCredential)
 	if err != nil {
@@ -96,13 +96,13 @@ func (router *AuthRouter) Restore(c *gin.Context) *R {
 	if lo.IsEmpty(token) || token != keyInCache {
 		return AuthenticationError(errors.New("恢复密钥错误"))
 	}
-	success, err := router.UserSvr.UpdateUser(&domain.UpdateUser{Name: restoreCredential.Username, Password: restoreCredential.Password})
+	success, err := r.UserSvr.UpdateUser(&domain.UpdateUser{Name: restoreCredential.Username, Password: restoreCredential.Password})
 	if err != nil || !success {
 		return InternalError(err)
 	}
 	// 在前端清理 localStore 之后
 	time.AfterFunc(60*time.Second, func() {
-		router.TokenSvr.DisabledAll()
+		r.TokenSvr.DisabledAll()
 	})
 	return OkMessage(nil, "重置成功!")
 }
@@ -115,24 +115,24 @@ func (router *AuthRouter) Restore(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {bool} bool
 // @Router /api/admin/auth [PUT]
-func (router *AuthRouter) UpdateUser(c *gin.Context) *R {
-	if router.Cfg.Demo {
+func (r *AuthRouter) UpdateUser(c *gin.Context) *R {
+	if r.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改账号密码！"))
 	}
 	var updateUser = &domain.UpdateUser{}
 	if err := c.Bind(updateUser); err != nil {
 		return InternalError(err)
 	}
-	updated, err := router.UserSvr.UpdateUser(updateUser)
+	updated, err := r.UserSvr.UpdateUser(updateUser)
 	if err != nil {
 		return InternalError(err)
 	}
 	return Ok(updated)
 }
 
-func (router *AuthRouter) Register(r *gin.Engine) {
-	r.POST(AuthPathPrefix+"/login", Handle(router.Login))
-	r.GET(AuthPathPrefix+"/logout", Handle(router.Logout))
-	r.POST(AuthPathPrefix+"/restore", Handle(router.Restore))
-	r.PUT(AuthPathPrefix+"", Handle(router.UpdateUser))
+func (ro *AuthRouter) Register(r *gin.Engine) {
+	r.POST(AuthPathPrefix+"/login", Handle(ro.Login))
+	r.GET(AuthPathPrefix+"/logout", Handle(ro.Logout))
+	r.POST(AuthPathPrefix+"/restore", Handle(ro.Restore))
+	r.PUT(AuthPathPrefix+"", Handle(ro.UpdateUser))
 }
