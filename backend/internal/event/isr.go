@@ -12,7 +12,6 @@ import (
 	"golang.org/x/exp/slog"
 	"strconv"
 	"strings"
-	"time"
 )
 
 // implementation backend publish isr notification
@@ -24,9 +23,6 @@ type IsrEventBus struct {
 	Bus        EventBus.Bus
 	Service    *svr.Service
 }
-
-const DefaultRetryCount = 3
-const DelayTimeout = time.Duration(3000) // default 3 second
 
 var IsrEventBusSet = wire.NewSet(NewIsrEventBus)
 
@@ -45,10 +41,10 @@ func (isr *IsrEventBus) handle(path string, args ...interface{}) {
 
 // retryHandle
 func (isr *IsrEventBus) retryHandle(retryCount int, path string, args ...interface{}) {
-	slog.Info("retry trigger isr rendering", "path", path, "retryCount", retryCount, "delay", DefaultRetryCount, "args", args)
+	slog.Info("retry trigger isr rendering", "path", path, "retryCount", retryCount, "delay", guc.DefaultRetryCount, "args", args)
 	var wg conc.WaitGroup
 	wg.Go(func() {
-		results := guc.Retry(retryCount, DelayTimeout, func() error {
+		results := guc.Retry(retryCount, guc.DelayTimeout, func() error {
 			_, err := fetch.Get(isr.WebSiteUrl, fetch.D{{"path", path}})
 			if err != nil {
 				slog.Error("failed to trigger isr rendering", "path", path)
@@ -86,7 +82,7 @@ func (isr *IsrEventBus) ActiveRetry(path Path, args ...interface{}) {
 			slog.Error("subscribe path has error", "err", err, "path", path)
 		}
 	}
-	bus.Publish(path, DefaultRetryCount, path, args)
+	bus.Publish(path, guc.DefaultRetryCount, path, args)
 }
 
 func (isr *IsrEventBus) ActiveAll(args ...interface{}) {

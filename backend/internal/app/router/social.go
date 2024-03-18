@@ -3,6 +3,7 @@ package router
 import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/domain"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ const SocialPathPrefix = "/api/admin/meta/social"
 type SocialRouter struct {
 	Cfg         *config.Config
 	MetaService *svr.MetaService
+	Isr         *event.IsrEventBus
 }
 
 var SocialRouterSet = wire.NewSet(wire.Struct(new(SocialRouter), "*"))
@@ -69,6 +71,7 @@ func (s *SocialRouter) UpdateSocial(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	s.Isr.ActiveAll("trigger incremental rendering by social update")
 	return Ok(successed)
 }
 
@@ -94,6 +97,7 @@ func (s *SocialRouter) CreateSocial(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	s.Isr.ActiveAll("trigger incremental rendering by social create")
 	return Ok(successed)
 }
 
@@ -115,6 +119,7 @@ func (s *SocialRouter) DeleteSocial(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	s.Isr.ActiveAll("trigger incremental rendering by social delete")
 	return Ok(successed)
 }
 

@@ -3,6 +3,7 @@ package router
 import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/domain"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ const SettingPathPrefix = "/api/admin/setting"
 type SettingRouter struct {
 	Cfg            *config.Config
 	SettingService *svr.SettingService
+	Isr            *event.IsrEventBus
 }
 
 var SettingRouterSet = wire.NewSet(wire.Struct(new(SettingRouter), "*"))
@@ -133,6 +135,7 @@ func (s *SettingRouter) UpdateLayoutSetting(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	s.Isr.ActiveAll("trigger incremental rendering by layout setting update")
 	return Ok(successed)
 }
 

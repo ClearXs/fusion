@@ -14,6 +14,7 @@ type Pipeline struct {
 	Id        int64     `json:"id" bson:"id"`
 	Name      string    `json:"name" bson:"name"`
 	EventType EventType `json:"eventType" bson:"eventType"`
+	EventName EventKey  `json:"eventName" bson:"eventName"`
 	Enabled   bool      `json:"enabled" bson:"enabled"`
 	Script    string    `json:"script" bson:"script"`
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`

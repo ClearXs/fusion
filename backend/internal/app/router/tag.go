@@ -2,6 +2,7 @@ package router
 
 import (
 	"cc.allio/fusion/config"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ const TagPathPrefix = "/api/admin/tag"
 type TagRouter struct {
 	Cfg        *config.Config
 	TagService *svr.TagService
+	Isr        *event.IsrEventBus
 }
 
 var TagRouterSet = wire.NewSet(wire.Struct(new(TagRouter), "*"))
@@ -67,6 +69,7 @@ func (t *TagRouter) UpdateTagByName(c *gin.Context) *R {
 	old := c.Param("name")
 	set := c.Query("value")
 	result := t.TagService.UpdateArticleTag(old, set)
+	t.Isr.ActiveAll("trigger incremental rendering by tags update")
 	return Ok(result)
 }
 
@@ -85,6 +88,7 @@ func (t *TagRouter) DeleteTagByName(c *gin.Context) *R {
 	}
 	name := c.Param("name")
 	result := t.TagService.DeleteArticleTag(name)
+	t.Isr.ActiveAll("trigger incremental rendering by tags delete")
 	return Ok(result)
 }
 

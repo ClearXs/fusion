@@ -226,3 +226,29 @@ func (s *SettingService) SaveOrUpdateLayoutSetting(layout *domain.LayoutSetting)
 		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LayoutSettingType}), bson.D{{"value", value}})
 	}
 }
+
+func (s *SettingService) FindIsrSetting() *domain.IsrSetting {
+	setting, err := s.SettingRepo.FindOne(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: IsrSettingType}))
+	if err != nil && setting != nil {
+		slog.Error("Find layout setting has error", "err", err)
+		return nil
+	}
+	return &domain.IsrSetting{
+		Mode: setting.Value["mode"].(string),
+	}
+}
+
+func (s *SettingService) SaveOrUpdateIsrSetting(isr *domain.IsrSetting) (bool, error) {
+	outdated := s.FindIsrSetting()
+	composite := utils.Composition[domain.IsrSetting](outdated, isr)
+	value := utils.EntityToMap[*domain.IsrSetting](composite)
+	if outdated == nil {
+		saved, err := s.SettingRepo.Save(&domain.Setting{Type: IsrSettingType, Value: value})
+		if err != nil {
+			return false, err
+		}
+		return saved > 0, nil
+	} else {
+		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: IsrSettingType}), bson.D{{"value", value}})
+	}
+}

@@ -3,6 +3,7 @@ package router
 import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/domain"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,8 @@ const SitePathPrefix = "/api/admin/meta/site"
 type SiteRouter struct {
 	Cfg         *config.Config
 	MetaService *svr.MetaService
+	Isr         *event.IsrEventBus
+	Script      *event.ScriptEngine
 }
 
 var SiteRouterSet = wire.NewSet(wire.Struct(new(SiteRouter), "*"))
@@ -52,6 +55,8 @@ func (s *SiteRouter) UpdateSite(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	s.Isr.ActiveAll("trigger incremental rendering by update site info")
+	s.Script.DispatchUpdateSiteInfoEvent(siteInfo)
 	return Ok(successed)
 }
 

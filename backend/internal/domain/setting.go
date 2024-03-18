@@ -38,3 +38,7 @@ type LayoutSetting struct {
 	Css    string `json:"css"`
 	Head   string `json:"head"`
 }
+
+type IsrSetting struct {
+	Mode string `json:"mode"`
+}

@@ -11,6 +11,9 @@ type Result struct {
 type Ok = Result
 type Error = Result
 
+const DefaultRetryCount = 3
+const DelayTimeout = time.Duration(3000) // default 3 second
+
 // Retry process f function, consider failed if return error is not nil.
 // then sleep delay time until to count or success
 func Retry(count int, delay time.Duration, f func() error) <-chan Result {

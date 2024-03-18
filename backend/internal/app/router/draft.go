@@ -19,6 +19,7 @@ type DraftRouter struct {
 	Cfg          *config.Config
 	DraftService *svr.DraftService
 	Isr          *event.IsrEventBus
+	Script       *event.ScriptEngine
 }
 
 var DraftRouterSet = wire.NewSet(wire.Struct(new(DraftRouter), "*"))
@@ -100,10 +101,12 @@ func (d *DraftRouter) UpdateDraft(c *gin.Context) *R {
 		return InternalError(err)
 	}
 	id := web.ParseNumberForQuery(c, "id", -1)
+	d.Script.DispatchBeforeUpdateDraftEvent(draft, id)
 	successed, err := d.DraftService.UpdateById(int64(id), draft)
 	if err != nil {
 		return InternalError(err)
 	}
+	d.Script.DispatchAfterUpdateDraftEvent(draft, id, successed)
 	return Ok(successed)
 }
 
@@ -122,10 +125,12 @@ func (d *DraftRouter) CreateDraft(c *gin.Context) *R {
 	if err := c.Bind(draft); err != nil {
 		return InternalError(err)
 	}
+	d.Script.DispatchBeforeUpdateDraftEvent(draft)
 	newDraft, err := d.DraftService.Create(draft)
 	if err != nil {
 		return InternalError(err)
 	}
+	d.Script.DispatchAfterUpdateDraftEvent(draft)
 	return Ok(newDraft)
 }
 
@@ -144,6 +149,7 @@ func (d *DraftRouter) DeleteDraft(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	d.Script.DispatchDeleteDraftEvent(id)
 	return Ok(successed)
 }
 
@@ -166,11 +172,13 @@ func (d *DraftRouter) PublishDraft(c *gin.Context) *R {
 	if err := c.Bind(option); err != nil {
 		return InternalError(err)
 	}
+	d.Script.DispatchBeforeUpdateDraftEvent(option)
 	newDraft, err := d.DraftService.Publish(int64(id), option)
 	if err != nil {
 		return InternalError(err)
 	}
 	d.Isr.ActiveAll("trigger incremental rendering by public draft")
+	d.Script.DispatchAfterUpdateDraftEvent(newDraft)
 	return Ok(newDraft)
 }
 

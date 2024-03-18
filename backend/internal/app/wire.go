@@ -23,6 +23,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		svr.ServiceSet,
 		router.Set,
 		event.IsrEventBusSet,
+		event.ScriptEngineSet,
 	))
 }
 

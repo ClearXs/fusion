@@ -3,6 +3,7 @@ package router
 import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/domain"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ const MenuPathPrefix = "/api/admin/meta/menu"
 type MenuRouter struct {
 	Cfg             *config.Config
 	SettingsService *svr.SettingService
+	Isr             *event.IsrEventBus
 }
 
 var MenuRouterSet = wire.NewSet(wire.Struct(new(MenuRouter), "*"))
@@ -55,6 +57,7 @@ func (m *MenuRouter) UpdateMenu(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	m.Isr.ActiveAll("trigger incremental rendering by menu update")
 	return Ok(successd)
 }
 

@@ -18,6 +18,7 @@ type ArticleRouter struct {
 	Cfg        *config.Config
 	ArticleSvr *svr.ArticleService
 	Isr        *event.IsrEventBus
+	Script     *event.ScriptEngine
 }
 
 var ArticleRouterSet = wire.NewSet(wire.Struct(new(ArticleRouter), "*"))
@@ -106,9 +107,10 @@ func (a *ArticleRouter) UpdateArticleById(c *gin.Context) *R {
 		return InternalError(err)
 	}
 	id := web.ParseNumberForPath(c, "id", -1)
+	a.Script.DispatchBeforeUpdateArticleEvent(article)
 	updated := a.ArticleSvr.UpdateById(int64(id), article)
-
 	a.Isr.ActiveAll("trigger incremental rendering by update article", article)
+	a.Script.DispatchAfterUpdateArticleEvent(article, updated)
 	return Ok(updated)
 }
 
@@ -131,10 +133,12 @@ func (a *ArticleRouter) CreateArticle(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
+	a.Script.DispatchBeforeUpdateArticleEvent(article)
 	create, err := a.ArticleSvr.Create(article)
 	if err != nil {
 		return InternalError(err)
 	}
+	a.Script.DispatchAfterUpdateArticleEvent(article, create)
 	a.Isr.ActiveAll("trigger incremental rendering by create article", article)
 	return Ok(create)
 }
@@ -155,6 +159,7 @@ func (a *ArticleRouter) DeleteArticle(c *gin.Context) *R {
 	id := web.ParseNumberForPath(c, "id", -1)
 	deleted := a.ArticleSvr.DeleteById(int64(id))
 	a.Isr.ActiveAll("trigger incremental rendering by delete article", id)
+	a.Script.DispatchDeleteArticleEvent(id, deleted)
 	return Ok(deleted)
 }
 

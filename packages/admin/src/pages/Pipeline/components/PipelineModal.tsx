@@ -20,7 +20,7 @@ export default function ({
 
   const check = (vals: any) => {
     const keys = Object.keys(vals);
-    const mustKeys = ['name', 'description', 'eventName', 'enabled'];
+    const mustKeys = ['name', 'description', 'EventName', 'enabled'];
     for (let i = 0; i < mustKeys.length; i++) {
       if (!keys.includes(mustKeys[i])) {
         return false;
@@ -30,8 +30,8 @@ export default function ({
   };
 
   useEffect(() => {
-    if (!initialValues || !initialValues.eventName) return;
-    const targetDes = config.find((item) => item.eventName === initialValues.eventName)
+    if (!initialValues || !initialValues.EventName) return;
+    const targetDes = config.find((item) => item.EventName === initialValues.EventName)
       ?.eventDescription;
     setDes(targetDes || '选择触发事件后讲展示详情');
   }, [initialValues, config]);
@@ -67,7 +67,7 @@ export default function ({
       <ProFormText name="name" label="名称" required />
       <ProFormText name="description" label="描述" required tooltip="给自己写的，防止忘了" />
       <ProFormSelect
-        name="eventName"
+        name="EventName"
         label="触发事件"
         tooltip="选择后可以看到事件的说明"
         required
@@ -76,12 +76,12 @@ export default function ({
           setConfig(data);
           return data?.map((item) => ({
             label: item.eventNameChinese,
-            value: item.eventName,
+            value: item.EventName,
           }));
         }}
         fieldProps={{
           onChange: (val) => {
-            const targetDes = config.find((item) => item.eventName === val)?.eventDescription;
+            const targetDes = config.find((item) => item.EventName === val)?.eventDescription;
             setDes(targetDes || '选择触发事件后讲展示详情');
           },
         }}

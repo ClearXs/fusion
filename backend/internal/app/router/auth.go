@@ -4,6 +4,7 @@ import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/credential"
 	"cc.allio/fusion/internal/domain"
+	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/cache"
 	"cc.allio/fusion/pkg/utils"
@@ -23,6 +24,7 @@ type AuthRouter struct {
 	AuthSvr  *svr.AuthService
 	UserSvr  *svr.UserService
 	TokenSvr *svr.TokenService
+	Script   *event.ScriptEngine
 }
 
 var AuthRouterSet = wire.NewSet(wire.Struct(new(AuthRouter), "*"))
@@ -50,6 +52,7 @@ func (r *AuthRouter) Login(c *gin.Context) *R {
 	if err != nil {
 		return AuthenticationError(err)
 	}
+	r.Script.DispatchLoginEvent(tokenUser)
 	return Ok(tokenUser)
 }
 
@@ -72,9 +75,9 @@ func (r *AuthRouter) Logout(c *gin.Context) *R {
 	}
 	if !succeed {
 		return InternalError(errors.New("登出失败"))
-	} else {
-		return OkMessage(succeed, "登出成功")
 	}
+	r.Script.DispatchLogoutEvent(token)
+	return OkMessage(succeed, "登出成功")
 }
 
 // Restore

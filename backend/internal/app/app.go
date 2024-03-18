@@ -16,6 +16,7 @@ type App struct {
 	Repository *repo.Repository
 	Database   *mongo.Database
 	Isr        *event.IsrEventBus
+	Script     *event.ScriptEngine
 }
 
 func New(
@@ -25,6 +26,7 @@ func New(
 	repository *repo.Repository,
 	database *mongo.Database,
 	isr *event.IsrEventBus,
+	script *event.ScriptEngine,
 ) *App {
 	return &App{
 		Cfg:        cfg,
@@ -33,5 +35,6 @@ func New(
 		Repository: repository,
 		Database:   database,
 		Isr:        isr,
+		Script:     script,
 	}
 }

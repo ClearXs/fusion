@@ -57,6 +57,8 @@ func main() {
 	// init router
 	a.Router.Init(r)
 
+	a.Isr.ActiveAll("trigger incremental rendering by startup")
+
 	// startup gin server
 	addr := ":" + strconv.Itoa(cfg.Server.Port)
 	slog.Info("\U0001FAE7 start server...", "address", addr)

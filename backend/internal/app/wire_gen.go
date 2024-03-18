@@ -147,6 +147,14 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg:                  cfg,
 		CustomPageRepository: customPageRepository,
 	}
+	pipelineRepository := &repo.PipelineRepository{
+		Cfg: cfg,
+		Db:  database,
+	}
+	pipelineService := &svr.PipelineService{
+		Cfg:                cfg,
+		PipelineRepository: pipelineRepository,
+	}
 	service := &svr.Service{
 		UserService:       userService,
 		TokenService:      tokenService,
@@ -163,6 +171,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		StaticService:     staticService,
 		CaddyService:      caddyService,
 		CustomPageService: customPageService,
+		PipelineService:   pipelineService,
 	}
 	isrEventBus := event.NewIsrEventBus(service)
 	aboutRouter := &router.AboutRouter{
@@ -174,16 +183,19 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg:         cfg,
 		AnalysisSvr: analysisService,
 	}
+	scriptEngine := event.NewScripEngine(pipelineService)
 	articleRouter := &router.ArticleRouter{
 		Cfg:        cfg,
 		ArticleSvr: articleService,
 		Isr:        isrEventBus,
+		Script:     scriptEngine,
 	}
 	authRouter := &router.AuthRouter{
 		Cfg:      cfg,
 		AuthSvr:  authService,
 		UserSvr:  userService,
 		TokenSvr: tokenService,
+		Script:   scriptEngine,
 	}
 	backupRouter := &router.BackupRouter{
 		Cfg:         cfg,
@@ -226,6 +238,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg:          cfg,
 		DraftService: draftService,
 		Isr:          isrEventBus,
+		Script:       scriptEngine,
 	}
 	linkRouter := &router.LinkRouter{
 		Cfg:         cfg,
@@ -234,6 +247,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 	menuRouter := &router.MenuRouter{
 		Cfg:             cfg,
 		SettingsService: settingService,
+		Isr:             isrEventBus,
 	}
 	metaRouter := &router.MetaRouter{
 		Cfg:         cfg,
@@ -246,18 +260,23 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 	settingRouter := &router.SettingRouter{
 		Cfg:            cfg,
 		SettingService: settingService,
+		Isr:            isrEventBus,
 	}
 	siteRouter := &router.SiteRouter{
 		Cfg:         cfg,
 		MetaService: metaService,
+		Isr:         isrEventBus,
+		Script:      scriptEngine,
 	}
 	socialRouter := &router.SocialRouter{
 		Cfg:         cfg,
 		MetaService: metaService,
+		Isr:         isrEventBus,
 	}
 	tagRouter := &router.TagRouter{
 		Cfg:        cfg,
 		TagService: tagService,
+		Isr:        isrEventBus,
 	}
 	tokenRouter := &router.TokenRouter{
 		Cfg:          cfg,
@@ -273,6 +292,16 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		SettingService:    settingService,
 		CustomPageService: customPageService,
 		CategoryService:   categoryService,
+	}
+	pipelineRouter := &router.PipelineRouter{
+		Cfg:             cfg,
+		PipelineService: pipelineService,
+		Script:          scriptEngine,
+	}
+	isrRouter := &router.IsrRouter{
+		Cfg:            cfg,
+		SettingService: settingService,
+		Isr:            isrEventBus,
 	}
 	routerRouter := &router.Router{
 		AboutRouter:        aboutRouter,
@@ -296,10 +325,8 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		TagRouter:          tagRouter,
 		TokenRouter:        tokenRouter,
 		PublicRouter:       publicRouter,
-	}
-	pipelineRepository := &repo.PipelineRepository{
-		Cfg: cfg,
-		Db:  database,
+		PipelineRouter:     pipelineRouter,
+		IsrRouter:          isrRouter,
 	}
 	repository := &repo.Repository{
 		ArticleRepository:    articleRepository,
@@ -315,7 +342,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		CustomPageRepository: customPageRepository,
 		PipelineRepository:   pipelineRepository,
 	}
-	app := New(cfg, routerRouter, service, repository, database, isrEventBus)
+	app := New(cfg, routerRouter, service, repository, database, isrEventBus, scriptEngine)
 	return app, func() {
 		cleanup()
 	}, nil
