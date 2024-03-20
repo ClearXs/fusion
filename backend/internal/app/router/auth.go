@@ -7,7 +7,7 @@ import (
 	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/cache"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
@@ -41,7 +41,7 @@ var AuthRouterSet = wire.NewSet(wire.Struct(new(AuthRouter), "*"))
 // @Success 200 {object} svr.TokenUser
 // @Router /api/admin/auth/login [Post]
 func (r *AuthRouter) Login(c *gin.Context) *R {
-	ip := utils.GetIpByRequest(c.Request)
+	ip := util.GetIpByRequest(c.Request)
 	slog.Info("ip %s", ip)
 	var loginCredential credential.LoginCredential
 	err := c.ShouldBind(&loginCredential)

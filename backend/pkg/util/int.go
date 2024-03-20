@@ -1,4 +1,4 @@
-package utils
+package util
 
 // ToIntBool 当i>0时返回true，否则返回false
 func ToIntBool(i int) bool {

@@ -5,7 +5,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/exp/slog"
@@ -101,7 +101,7 @@ func (v *ViewerService) SaveOrUpdateViewer(dateViewer *domain.DateViewer) (bool,
 		return false, nil
 	}
 	if viewer != nil {
-		value := utils.ToBsonElements(dateViewer)
+		value := util.ToBsonElements(dateViewer)
 		return v.ViewerRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: viewer.Id}), value)
 	} else {
 		view := &domain.Viewer{

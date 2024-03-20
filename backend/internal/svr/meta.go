@@ -5,7 +5,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"errors"
 	"github.com/google/wire"
 	"github.com/samber/lo"
@@ -45,9 +45,9 @@ func (m *MetaService) UpdateSiteInfo(siteInfo *domain.SiteInfo) (bool, error) {
 	if meta != nil {
 		return false, errors.New("meta is empty")
 	}
-	value := utils.Composition[domain.SiteInfo](meta.SiteInfo, siteInfo)
+	value := util.Composition[domain.SiteInfo](meta.SiteInfo, siteInfo)
 
-	elements := utils.ToBsonElements(value)
+	elements := util.ToBsonElements(value)
 	return m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: meta.Id}), bson.D{{"siteInfo", elements}})
 }
 

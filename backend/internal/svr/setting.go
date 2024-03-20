@@ -6,7 +6,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/exp/slog"
@@ -52,8 +52,8 @@ func (s *SettingService) FindStaticSetting() *domain.StaticSetting {
 
 func (s *SettingService) SaveOrUpdateStaticSetting(static *domain.StaticSetting) (bool, error) {
 	outdated := s.FindStaticSetting()
-	composite := utils.Composition[domain.StaticSetting](outdated, static)
-	value := utils.EntityToMap[*domain.StaticSetting](composite)
+	composite := util.Composition[domain.StaticSetting](outdated, static)
+	value := util.EntityToMap[*domain.StaticSetting](composite)
 	if outdated == nil {
 		saved, err := s.SettingRepo.Save(&domain.Setting{Type: StaticSettingType, Value: value})
 		if err != nil {
@@ -85,8 +85,8 @@ func (s *SettingService) FindLoginSetting() *domain.LoginSetting {
 
 func (s *SettingService) SaveOrUpdateLoginSetting(layout *domain.LoginSetting) (bool, error) {
 	outdated := s.FindLoginSetting()
-	composite := utils.Composition[domain.LoginSetting](outdated, layout)
-	value := utils.EntityToMap[*domain.LoginSetting](composite)
+	composite := util.Composition[domain.LoginSetting](outdated, layout)
+	value := util.EntityToMap[*domain.LoginSetting](composite)
 	if outdated == nil {
 		saved, err := s.SettingRepo.Save(&domain.Setting{Type: LoginSettingType, Value: value})
 		if err != nil {
@@ -146,14 +146,14 @@ func (s *SettingService) FindMenuSettings() []*domain.MenuItem {
 	}
 	value := setting.Value
 	data := value["data"].([]map[string]any)
-	menus := utils.MapArrayToEntityArray[*domain.MenuItem](data, func() *domain.MenuItem { return &domain.MenuItem{} })
+	menus := util.MapArrayToEntityArray[*domain.MenuItem](data, func() *domain.MenuItem { return &domain.MenuItem{} })
 	return menus
 }
 
 func (s *SettingService) SaveOrUpdateMenuSettings(menu *domain.MenuItem) (bool, error) {
 	menus := s.FindMenuSettings()
 	value := make(map[string]any)
-	value["data"] = utils.EntityArrayToMapArray[*domain.MenuItem](append(menus, menu))
+	value["data"] = util.EntityArrayToMapArray[*domain.MenuItem](append(menus, menu))
 	if len(menus) == 0 {
 		saved, err := s.SettingRepo.Save(&domain.Setting{Type: MenuSettingType, Value: value})
 		if err != nil {
@@ -183,8 +183,8 @@ func (s *SettingService) FindWalineSetting() *domain.WalineSetting {
 
 func (s *SettingService) SaveOrUpdateWalineSetting(waline *domain.WalineSetting) (bool, error) {
 	outdated := s.FindWalineSetting()
-	composite := utils.Composition[domain.WalineSetting](outdated, waline)
-	value := utils.EntityToMap[*domain.WalineSetting](composite)
+	composite := util.Composition[domain.WalineSetting](outdated, waline)
+	value := util.EntityToMap[*domain.WalineSetting](composite)
 	if outdated == nil {
 		saved, err := s.SettingRepo.Save(&domain.Setting{Type: WalineSettingType, Value: value})
 		if err != nil {
@@ -214,8 +214,8 @@ func (s *SettingService) FindLayoutSetting() *domain.LayoutSetting {
 
 func (s *SettingService) SaveOrUpdateLayoutSetting(layout *domain.LayoutSetting) (bool, error) {
 	outdated := s.FindLayoutSetting()
-	composite := utils.Composition[domain.LayoutSetting](outdated, layout)
-	value := utils.EntityToMap[*domain.LayoutSetting](composite)
+	composite := util.Composition[domain.LayoutSetting](outdated, layout)
+	value := util.EntityToMap[*domain.LayoutSetting](composite)
 	if outdated == nil {
 		saved, err := s.SettingRepo.Save(&domain.Setting{Type: LayoutSettingType, Value: value})
 		if err != nil {
@@ -240,8 +240,8 @@ func (s *SettingService) FindIsrSetting() *domain.IsrSetting {
 
 func (s *SettingService) SaveOrUpdateIsrSetting(isr *domain.IsrSetting) (bool, error) {
 	outdated := s.FindIsrSetting()
-	composite := utils.Composition[domain.IsrSetting](outdated, isr)
-	value := utils.EntityToMap[*domain.IsrSetting](composite)
+	composite := util.Composition[domain.IsrSetting](outdated, isr)
+	value := util.EntityToMap[*domain.IsrSetting](composite)
 	if outdated == nil {
 		saved, err := s.SettingRepo.Save(&domain.Setting{Type: IsrSettingType, Value: value})
 		if err != nil {

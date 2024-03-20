@@ -5,7 +5,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"errors"
 	"github.com/google/wire"
 	"github.com/samber/lo"
@@ -74,7 +74,7 @@ func (p *PipelineService) CreatePipeline(pipeline *domain.Pipeline) (bool, error
 }
 
 func (p *PipelineService) UpdatePipeline(pipeline *domain.Pipeline) (bool, error) {
-	data := utils.ToBsonElements(pipeline)
+	data := util.ToBsonElements(pipeline)
 	return p.PipelineRepository.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: pipeline.Id}), data)
 }
 

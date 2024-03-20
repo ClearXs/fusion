@@ -1,4 +1,4 @@
-package utils
+package util
 
 // Combination combine for a1 and a2
 func Combination[T interface{}](a1 []T, a2 []T) []T {

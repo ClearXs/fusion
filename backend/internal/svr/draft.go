@@ -6,7 +6,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"errors"
 	"github.com/google/wire"
 	"github.com/samber/lo"
@@ -112,7 +112,7 @@ func (d *DraftService) DeleteById(id int64) (bool, error) {
 }
 
 func (d *DraftService) UpdateById(id int64, draft *domain.Draft) (bool, error) {
-	update := utils.ToBsonElements(draft)
+	update := util.ToBsonElements(draft)
 	return d.DraftRepo.Update(mongodb.NewLogicalOrDefault(bson.E{Key: "id", Value: id}), update)
 }
 

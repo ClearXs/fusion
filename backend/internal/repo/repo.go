@@ -2,7 +2,7 @@ package repo
 
 import (
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"context"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,6 +23,7 @@ const (
 	StaticCollection     = "statics"
 	CustomPageCollection = "custompages"
 	PipelineCollection   = "pipelines"
+	FileCollection       = "files"
 )
 
 type Repository struct {
@@ -38,6 +39,7 @@ type Repository struct {
 	VisitRepository      *VisitRepository
 	CustomPageRepository *CustomPageRepository
 	PipelineRepository   *PipelineRepository
+	FileRepository       *FileRepository
 }
 
 var RepositorySet = wire.NewSet(
@@ -53,6 +55,7 @@ var RepositorySet = wire.NewSet(
 	VisitRepositorySet,
 	CustomPageRepositorySet,
 	PipelineRepositorySet,
+	FileRepositorySet,
 	wire.Struct(new(Repository), "*"),
 )
 
@@ -75,7 +78,7 @@ func handleSave[T interface{}](coll *mongo.Collection, insert *T, opts ...*optio
 		return int64(-1), err
 	}
 	idString := string(result.InsertedID.([]byte))
-	id := utils.ToStringInt(idString, -1)
+	id := util.ToStringInt(idString, -1)
 	return int64(id), nil
 }
 
@@ -87,7 +90,7 @@ func handleSaveMany(coll *mongo.Collection, insert []interface{}, opts ...*optio
 	ids := make([]int64, 0)
 	for _, insertedId := range result.InsertedIDs {
 		idString := string(insertedId.([]byte))
-		id := utils.ToStringInt(idString, -1)
+		id := util.ToStringInt(idString, -1)
 		ids = append(ids, int64(id))
 	}
 	return ids, nil

@@ -5,7 +5,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"errors"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
@@ -56,7 +56,7 @@ func (userSvr *UserService) GetUserByUsernameAndPassword(username string, passwo
 	if user == nil {
 		return nil
 	}
-	encryptPassword := utils.EncryptPassword(user.Name, password, user.Salt)
+	encryptPassword := util.EncryptPassword(user.Name, password, user.Salt)
 	result, err := userSvr.UserRepository.FindOne(mongodb.NewLogicalDefaultArray(bson.D{{"name", username}, {"password", encryptPassword}}))
 	if err != nil {
 		slog.Error(err.Error())
@@ -67,7 +67,7 @@ func (userSvr *UserService) GetUserByUsernameAndPassword(username string, passwo
 	}
 	defer func() {
 		// update salt
-		newSalt := utils.MakeSalt()
+		newSalt := util.MakeSalt()
 		userSvr.UserRepository.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: result.Id}), bson.D{{"salt", newSalt}})
 	}()
 	return result
@@ -80,7 +80,7 @@ func (userSvr *UserService) UpdateUser(user *domain.UpdateUser) (bool, error) {
 	}
 	return userSvr.UserRepository.Update(
 		mongodb.NewLogicalDefault(bson.E{Key: "id", Value: curUser.Id}),
-		bson.D{{"name", user.Name}, {"nickname", user.Nickname}, {"password", utils.EncryptPassword(user.Name, user.Password, curUser.Salt)}},
+		bson.D{{"name", user.Name}, {"nickname", user.Nickname}, {"password", util.EncryptPassword(user.Name, user.Password, curUser.Salt)}},
 	)
 }
 
@@ -126,11 +126,11 @@ func (userSvr *UserService) UpdateCollaborator(collaborator *domain.User) (bool,
 		return false, errors.New("collaborator non existent")
 	}
 
-	salt := utils.MakeSalt()
-	password := utils.EncryptPassword(collaborator.Name, collaborator.Password, salt)
+	salt := util.MakeSalt()
+	password := util.EncryptPassword(collaborator.Name, collaborator.Password, salt)
 	collaborator.Password = password
 	collaborator.Salt = salt
-	elements := utils.ToBsonElements(collaborator)
+	elements := util.ToBsonElements(collaborator)
 	filter := mongodb.NewLogicalOrDefaultArray(bson.D{{"id", user.Id}, {"type", domain.CollaborateUserType}})
 	return userSvr.UserRepository.Update(filter, elements)
 }

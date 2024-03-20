@@ -2,6 +2,7 @@ package config
 
 import (
 	"cc.allio/fusion/pkg/mongodb"
+	"cc.allio/fusion/pkg/storage"
 	"gopkg.in/yaml.v3"
 	"os"
 )
@@ -33,6 +34,7 @@ type Config struct {
 	CodeRunner   CodeRunner      `yaml:"codeRunner"`
 	PluginRunner PluginRunner    `yaml:"pluginRunner"`
 	Mongodb      mongodb.Mongodb `yaml:"mongodb"`
+	Storage      storage.Policy  `yaml:"storage"`
 }
 
 func GetConfig() (*Config, error) {

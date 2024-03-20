@@ -5,7 +5,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"errors"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
@@ -146,7 +146,7 @@ func (c *CategoryService) Update(entity *domain.Category) (bool, error) {
 		c.ArticleSvr.UpdateById(article.Id, article)
 	}
 	// 修改分类
-	categoryBson := utils.ToBsonElements(entity)
+	categoryBson := util.ToBsonElements(entity)
 	update := bson.D{{"$set", categoryBson}}
 	updated, err := c.CategoryRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "name", Value: entity.Name}), update)
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/utils"
+	"cc.allio/fusion/pkg/util"
 	"errors"
 	"github.com/google/wire"
 	"github.com/samber/lo"
@@ -130,7 +130,7 @@ func (a *ArticleService) Create(article *domain.Article) (*domain.Article, error
 
 func (a *ArticleService) UpdateById(id int64, article *domain.Article) bool {
 	filter := mongodb.NewLogicalDefault(bson.E{Key: "id", Value: id})
-	articleBson := utils.ToBsonElements(article)
+	articleBson := util.ToBsonElements(article)
 	update := bson.D{{"$set", articleBson}}
 	updated, err := a.ArticleRepo.Update(filter, update)
 	if err != nil {
@@ -258,13 +258,13 @@ func (a *ArticleService) GetByOption(option credential.ArticleSearchOptionCreden
 	if isPublic && option.PageSize != -1 {
 		topArticles := lo.Filter(articles, func(article *domain.Article, index int) bool {
 			top := article.Top
-			return utils.ToIntBool(int(top))
+			return util.ToIntBool(int(top))
 		})
 		exclusionArticles := lo.Filter(articles, func(article *domain.Article, index int) bool {
 			top := article.Top
-			return !utils.ToIntBool(int(top))
+			return !util.ToIntBool(int(top))
 		})
-		articles = utils.Combination[*domain.Article](topArticles, exclusionArticles)
+		articles = util.Combination[*domain.Article](topArticles, exclusionArticles)
 		skip := (option.Page - 1) & option.PageSize
 		end := skip + option.PageSize
 		if end > len(articles)-1 {
@@ -325,7 +325,7 @@ func (a *ArticleService) GetByOption(option credential.ArticleSearchOptionCreden
 		totalWordCount = lo.Reduce(
 			articles,
 			func(total int64, article *domain.Article, index int) int64 {
-				total += utils.WordCount(article.Content)
+				total += util.WordCount(article.Content)
 				return total
 			},
 			int64(0))
