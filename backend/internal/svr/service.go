@@ -28,6 +28,7 @@ type Service struct {
 	CaddyService      *CaddyService
 	CustomPageService *CustomPageService
 	PipelineService   *PipelineService
+	FileService       *FileService
 }
 
 var ServiceSet = wire.NewSet(
@@ -47,5 +48,6 @@ var ServiceSet = wire.NewSet(
 	CaddyServiceSet,
 	CustomPageServiceSet,
 	PipelineServiceSet,
+	FileServiceSet,
 	wire.Struct(new(Service), "*"),
 )

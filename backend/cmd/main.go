@@ -1,19 +1,12 @@
-/*
- *
- *  ____ _  _ ____ _ ____ _  _
- * |___ |  | [__  | |  | |\ |
- * |    |__| ___] | |__| | \|
- *
- * generate by https://patorjk.com/software/taag/#p=testall&f=Standard&t=Fusion
- */
 package main
 
 import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/app"
+	"cc.allio/fusion/pkg/env"
 	"cc.allio/fusion/pkg/logger"
-	"cc.allio/fusion/pkg/middleware"
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/slog"
@@ -50,9 +43,6 @@ func main() {
 
 	// init gin
 	r := gin.New()
-	// middleware setup
-	r.Use(gin.Recovery())
-	r.Use(middleware.Logging())
 
 	// init router
 	a.Router.Init(r)
@@ -61,7 +51,13 @@ func main() {
 
 	// startup gin server
 	addr := ":" + strconv.Itoa(cfg.Server.Port)
-	slog.Info("\U0001FAE7 start server...", "address", addr)
+	fmt.Println(`
+  ____ _  _ ____ _ ____ _  _
+  |___ |  | [__  | |  | |\ |
+  |    |__| ___] | |__| | \|
+
+    version` + env.Version + `     address` + addr + `
+`)
 	err = r.Run(addr)
 	if err != nil {
 		slog.Error("start server failed", "err", err)

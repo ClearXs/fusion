@@ -10,10 +10,11 @@ type StorageType = string
 const (
 	ImgStaticType        StaticType = "img"
 	CustomPageStaticType StaticType = "customPage"
+	FileStaticType       StaticType = ""
 )
 
 const (
-	PicgoStorageType StorageType = "picgo"
+	MinioStorageType StorageType = "minio"
 	LocalStorageType StorageType = "local"
 )
 
@@ -26,4 +27,9 @@ type Static struct {
 	Name        string      `json:"name" bson:"name"`
 	Sign        string      `json:"sign" bson:"sign"`
 	UpdatedAt   time.Time   `json:"updatedAt" bson:"updatedAt"`
+}
+
+type StaticPageResult struct {
+	Data  []*Static `json:"data"`
+	Total int64     `json:"total"`
 }

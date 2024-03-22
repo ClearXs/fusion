@@ -23,7 +23,6 @@ const (
 	StaticCollection     = "statics"
 	CustomPageCollection = "custompages"
 	PipelineCollection   = "pipelines"
-	FileCollection       = "files"
 )
 
 type Repository struct {
@@ -39,7 +38,6 @@ type Repository struct {
 	VisitRepository      *VisitRepository
 	CustomPageRepository *CustomPageRepository
 	PipelineRepository   *PipelineRepository
-	FileRepository       *FileRepository
 }
 
 var RepositorySet = wire.NewSet(
@@ -55,7 +53,6 @@ var RepositorySet = wire.NewSet(
 	VisitRepositorySet,
 	CustomPageRepositorySet,
 	PipelineRepositorySet,
-	FileRepositorySet,
 	wire.Struct(new(Repository), "*"),
 )
 

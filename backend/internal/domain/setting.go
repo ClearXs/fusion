@@ -1,5 +1,7 @@
 package domain
 
+import "cc.allio/fusion/pkg/storage"
+
 type Setting struct {
 	Id    int64          `json:"id" bson:"id"`
 	Type  string         `bson:"type" json:"type"`
@@ -7,12 +9,14 @@ type Setting struct {
 }
 
 type StaticSetting struct {
-	StorageType     string      `json:"storageType"`
-	PicgoConfig     interface{} `json:"picgoConfig"`
-	PicgoPlugins    interface{} `json:"picgoPlugins"`
-	EnableWaterMark bool        `json:"enableWaterMark"`
-	WaterMarkText   string      `json:"waterMarkText"`
-	EnableWebp      bool        `json:"enableWebp"`
+	Mode            storage.PolicyMode `json:"mode" bson:"mode"`
+	Endpoint        string             `json:"endpoint" bson:"endpoint"`
+	AccessKeyID     string             `json:"accessKeyID" bson:"accessKeyID"`
+	SecretAccessKey string             `json:"secretAccessKey" bson:"secretAccessKey"`
+	Bucket          string             `json:"bucket" bson:"bucket"`
+	BaseDir         string             `json:"baseDir" bson:"baseDir"`
+	WaterMarkText   string             `json:"waterMarkText" bson:"waterMarkText"`
+	EnableWaterMark bool               `json:"enableWaterMark" bson:"enableWaterMark"`
 }
 
 type LoginSetting struct {

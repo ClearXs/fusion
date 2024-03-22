@@ -2,8 +2,10 @@ package local
 
 import (
 	"cc.allio/fusion/pkg/storage"
+	"cc.allio/fusion/pkg/storage/driver"
 	"cc.allio/fusion/pkg/util"
 	"context"
+	"github.com/google/uuid"
 	"golang.org/x/exp/slog"
 	"io"
 	"io/fs"
@@ -17,7 +19,12 @@ type Driver struct {
 	Policy *storage.Policy
 }
 
-func NewLocalDriver(policy *storage.Policy) *Driver {
+func (l *Driver) Sign(ctx context.Context, file *storage.FileHeader) (string, error) {
+	key := uuid.NewString()
+	return util.Encrypt(key), nil
+}
+
+func NewLocalDriver(policy *storage.Policy) driver.Handler {
 	return &Driver{policy}
 }
 
@@ -72,7 +79,7 @@ func (l *Driver) Download(ctx context.Context, path string) (storage.RSCloser, e
 	return file, err
 }
 
-func (l *Driver) Thumb(ctx context.Context, file *storage.File) (*storage.ContentResponse, error) {
+func (l *Driver) Thumb(ctx context.Context, file *storage.FileHeader) (*storage.ContentResponse, error) {
 	thumbFile := file.ThumbFile()
 
 	rsCloser, err := l.Download(ctx, thumbFile)

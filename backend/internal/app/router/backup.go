@@ -73,7 +73,7 @@ func (a *BackupRouter) ExportBackup(c *gin.Context) *R {
 		backup.Visits = visits
 	}
 	{
-		statics := a.StaticSvr.GetAll()
+		statics := a.StaticSvr.GetAll("")
 		backup.Static = statics
 	}
 	{

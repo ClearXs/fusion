@@ -6,6 +6,7 @@ import (
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
+	"cc.allio/fusion/pkg/storage"
 	"cc.allio/fusion/pkg/util"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
@@ -40,12 +41,14 @@ func (s *SettingService) FindStaticSetting() *domain.StaticSetting {
 	}
 	value := setting.Value
 	staticSetting := &domain.StaticSetting{
-		StorageType:     value["storageType"].(string),
-		PicgoConfig:     value["picgoConfig"],
-		PicgoPlugins:    value["picgoPlugins"],
-		EnableWaterMark: value["enableWaterMark"].(bool),
-		WaterMarkText:   value["WaterMarkText"].(string),
-		EnableWebp:      value["enableWebp"].(bool),
+		Mode:            util.GetValue[string](value, "mode", storage.LocalMode),
+		Endpoint:        util.GetValue[string](value, "endpoint", ""),
+		AccessKeyID:     util.GetValue[string](value, "accessKeyID", ""),
+		SecretAccessKey: util.GetValue[string](value, "secretAccessKey", ""),
+		Bucket:          util.GetValue[string](value, "bucket", ""),
+		BaseDir:         util.GetValue[string](value, "baseDir", ""),
+		WaterMarkText:   util.GetValue[string](value, "waterMarkText", ""),
+		EnableWaterMark: util.GetValue[bool](value, "enableWaterMark", false),
 	}
 	return staticSetting
 }

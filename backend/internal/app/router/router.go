@@ -2,6 +2,7 @@ package router
 
 import (
 	"cc.allio/fusion/docs"
+	"cc.allio/fusion/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	swaggerfiles "github.com/swaggo/files"
@@ -37,6 +38,7 @@ type Router struct {
 	PublicRouter       *PublicRouter
 	PipelineRouter     *PipelineRouter
 	IsrRouter          *IsrRouter
+	ImgRouter          *ImgRouter
 }
 
 var Set = wire.NewSet(
@@ -63,11 +65,17 @@ var Set = wire.NewSet(
 	PublicRouterSet,
 	PipelineRouterSet,
 	IsrRouterSet,
+	ImgRouterSet,
 	wire.Struct(new(Router), "*"),
 )
 
 // Init initiation system router
 func (router *Router) Init(r *gin.Engine) {
+
+	// middleware setup
+	r.Use(gin.Recovery())
+	r.Use(middleware.Logging())
+
 	// swagger
 	docs.SwaggerInfo.Title = "Fusion"
 	docs.SwaggerInfo.Description = "This is a Fusion system."
@@ -102,6 +110,7 @@ func (router *Router) Init(r *gin.Engine) {
 		router.PublicRouter.Register(r)
 		router.PipelineRouter.Register(r)
 		router.IsrRouter.Register(r)
+		router.ImgRouter.Register(r)
 	}
 
 	// route or method not found

@@ -1072,6 +1072,243 @@
                 }
             }
         },
+        "/api/admin/img": {
+            "get": {
+                "description": "get images by option",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Static"
+                ],
+                "summary": "get images by option",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "pageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "staticType",
+                        "name": "staticType",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.StaticPageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/img/:sign": {
+            "get": {
+                "description": "delete image by sign",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Static"
+                ],
+                "summary": "delete image by sign",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/img/all": {
+            "get": {
+                "description": "get all images",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Static"
+                ],
+                "summary": "get all images",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Static"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/img/all/delete": {
+            "get": {
+                "description": "delete all images",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Static"
+                ],
+                "summary": "delete all images",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/img/upload": {
+            "post": {
+                "description": "Upload image",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Static"
+                ],
+                "summary": "Upload image",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "waterMarkText",
+                        "name": "waterMarkText",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "withWaterMark",
+                        "name": "withWaterMark",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/isr": {
+            "get": {
+                "description": "get isr setting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Isr"
+                ],
+                "summary": "get isr setting",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.IsrSetting"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update isr setting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Isr"
+                ],
+                "summary": "update isr setting",
+                "parameters": [
+                    {
+                        "description": "isr",
+                        "name": "isr",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.IsrSetting"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Draft"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "active isr",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Isr"
+                ],
+                "summary": "active isr",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/meta": {
             "get": {
                 "description": "get meta info",
@@ -1621,6 +1858,189 @@
                             "items": {
                                 "$ref": "#/definitions/domain.SocialItem"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/pipeline": {
+            "get": {
+                "description": "get all pipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "get all pipeline",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Pipeline"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update pipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "update pipeline",
+                "parameters": [
+                    {
+                        "description": "pipeline",
+                        "name": "pipeline",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Pipeline"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create pipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "create pipeline",
+                "parameters": [
+                    {
+                        "description": "pipeline",
+                        "name": "pipeline",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Pipeline"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/pipeline/:id": {
+            "get": {
+                "description": "get pipeline by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "get pipeline by id",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Pipeline"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete pipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "delete pipeline",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/pipeline/config": {
+            "get": {
+                "description": "get system default pipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "get system default pipeline",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.EventItem"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/admin/pipeline/trigger/:id": {
+            "get": {
+                "description": "trigger pipeline",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "trigger pipeline",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "boolean"
                         }
                     }
                 }
@@ -2853,11 +3273,76 @@
                 }
             }
         },
+        "domain.EventItem": {
+            "type": "object",
+            "properties": {
+                "EventDescription": {
+                    "type": "string"
+                },
+                "EventName": {
+                    "$ref": "#/definitions/domain.EventKey"
+                },
+                "EventNameChinese": {
+                    "type": "string"
+                },
+                "Passive": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "domain.EventKey": {
+            "type": "string",
+            "enum": [
+                "login",
+                "logout",
+                "beforeUpdateArticle",
+                "afterUpdateArticle",
+                "deleteArticle",
+                "beforeUpdateDraft",
+                "afterUpdateDraft",
+                "deleteDraft",
+                "updateSiteInfo",
+                "manualTriggerEvent"
+            ],
+            "x-enum-varnames": [
+                "LoginEvent",
+                "LogoutEvent",
+                "BeforeUpdateArticleEvent",
+                "AfterUpdateArticleEvent",
+                "DeleteArticleEvent",
+                "BeforeUpdateDraftEvent",
+                "AfterUpdateDraftEvent",
+                "DeleteDraftEvent",
+                "UpdateSiteInfoEvent",
+                "ManualTriggerEvent"
+            ]
+        },
+        "domain.EventType": {
+            "type": "string",
+            "enum": [
+                "system",
+                "custom",
+                "cron"
+            ],
+            "x-enum-varnames": [
+                "SystemEventType",
+                "CustomEventType",
+                "CornEventType"
+            ]
+        },
         "domain.HttpSetting": {
             "type": "object",
             "properties": {
                 "redirect": {
                     "type": "boolean"
+                }
+            }
+        },
+        "domain.IsrSetting": {
+            "type": "object",
+            "properties": {
+                "mode": {
+                    "type": "string"
                 }
             }
         },
@@ -2985,6 +3470,38 @@
                 },
                 "visited": {
                     "type": "integer"
+                }
+            }
+        },
+        "domain.Pipeline": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "deleted": {
+                    "type": "boolean"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "eventName": {
+                    "$ref": "#/definitions/domain.EventKey"
+                },
+                "eventType": {
+                    "$ref": "#/definitions/domain.EventType"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "script": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
                 }
             }
         },
@@ -3171,24 +3688,99 @@
                 "WechatDarkSocialType"
             ]
         },
+        "domain.Static": {
+            "type": "object",
+            "properties": {
+                "fileType": {
+                    "type": "string"
+                },
+                "meta": {},
+                "name": {
+                    "type": "string"
+                },
+                "realPath": {
+                    "type": "string"
+                },
+                "sign": {
+                    "type": "string"
+                },
+                "staticType": {
+                    "$ref": "#/definitions/domain.StaticType"
+                },
+                "storageType": {
+                    "$ref": "#/definitions/domain.StorageType"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.StaticPageResult": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Static"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.StaticSetting": {
             "type": "object",
             "properties": {
+                "accessKeyID": {
+                    "type": "string"
+                },
+                "baseDir": {
+                    "type": "string"
+                },
+                "bucket": {
+                    "type": "string"
+                },
                 "enableWaterMark": {
                     "type": "boolean"
                 },
-                "enableWebp": {
-                    "type": "boolean"
+                "endpoint": {
+                    "type": "string"
                 },
-                "picgoConfig": {},
-                "picgoPlugins": {},
-                "storageType": {
+                "mode": {
+                    "type": "string"
+                },
+                "secretAccessKey": {
                     "type": "string"
                 },
                 "waterMarkText": {
                     "type": "string"
                 }
             }
+        },
+        "domain.StaticType": {
+            "type": "string",
+            "enum": [
+                "img",
+                "customPage",
+                ""
+            ],
+            "x-enum-varnames": [
+                "ImgStaticType",
+                "CustomPageStaticType",
+                "FileStaticType"
+            ]
+        },
+        "domain.StorageType": {
+            "type": "string",
+            "enum": [
+                "minio",
+                "local"
+            ],
+            "x-enum-varnames": [
+                "MinioStorageType",
+                "LocalStorageType"
+            ]
         },
         "domain.Theme": {
             "type": "string",

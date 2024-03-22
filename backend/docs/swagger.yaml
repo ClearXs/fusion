@@ -253,10 +253,60 @@ definitions:
       total:
         type: integer
     type: object
+  domain.EventItem:
+    properties:
+      EventDescription:
+        type: string
+      EventName:
+        $ref: '#/definitions/domain.EventKey'
+      EventNameChinese:
+        type: string
+      Passive:
+        type: boolean
+    type: object
+  domain.EventKey:
+    enum:
+    - login
+    - logout
+    - beforeUpdateArticle
+    - afterUpdateArticle
+    - deleteArticle
+    - beforeUpdateDraft
+    - afterUpdateDraft
+    - deleteDraft
+    - updateSiteInfo
+    - manualTriggerEvent
+    type: string
+    x-enum-varnames:
+    - LoginEvent
+    - LogoutEvent
+    - BeforeUpdateArticleEvent
+    - AfterUpdateArticleEvent
+    - DeleteArticleEvent
+    - BeforeUpdateDraftEvent
+    - AfterUpdateDraftEvent
+    - DeleteDraftEvent
+    - UpdateSiteInfoEvent
+    - ManualTriggerEvent
+  domain.EventType:
+    enum:
+    - system
+    - custom
+    - cron
+    type: string
+    x-enum-varnames:
+    - SystemEventType
+    - CustomEventType
+    - CornEventType
   domain.HttpSetting:
     properties:
       redirect:
         type: boolean
+    type: object
+  domain.IsrSetting:
+    properties:
+      mode:
+        type: string
     type: object
   domain.LayoutSetting:
     properties:
@@ -340,6 +390,27 @@ definitions:
         type: integer
       visited:
         type: integer
+    type: object
+  domain.Pipeline:
+    properties:
+      createdAt:
+        type: string
+      deleted:
+        type: boolean
+      enabled:
+        type: boolean
+      eventName:
+        $ref: '#/definitions/domain.EventKey'
+      eventType:
+        $ref: '#/definitions/domain.EventType'
+      id:
+        type: integer
+      name:
+        type: string
+      script:
+        type: string
+      updatedAt:
+        type: string
     type: object
   domain.RewardItem:
     properties:
@@ -466,19 +537,70 @@ definitions:
     - GiteeSocialType
     - WechatSocialType
     - WechatDarkSocialType
+  domain.Static:
+    properties:
+      fileType:
+        type: string
+      meta: {}
+      name:
+        type: string
+      realPath:
+        type: string
+      sign:
+        type: string
+      staticType:
+        $ref: '#/definitions/domain.StaticType'
+      storageType:
+        $ref: '#/definitions/domain.StorageType'
+      updatedAt:
+        type: string
+    type: object
+  domain.StaticPageResult:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.Static'
+        type: array
+      total:
+        type: integer
+    type: object
   domain.StaticSetting:
     properties:
+      accessKeyID:
+        type: string
+      baseDir:
+        type: string
+      bucket:
+        type: string
       enableWaterMark:
         type: boolean
-      enableWebp:
-        type: boolean
-      picgoConfig: {}
-      picgoPlugins: {}
-      storageType:
+      endpoint:
+        type: string
+      mode:
+        type: string
+      secretAccessKey:
         type: string
       waterMarkText:
         type: string
     type: object
+  domain.StaticType:
+    enum:
+    - img
+    - customPage
+    - ""
+    type: string
+    x-enum-varnames:
+    - ImgStaticType
+    - CustomPageStaticType
+    - FileStaticType
+  domain.StorageType:
+    enum:
+    - minio
+    - local
+    type: string
+    x-enum-varnames:
+    - MinioStorageType
+    - LocalStorageType
   domain.Theme:
     enum:
     - auto
@@ -1273,6 +1395,162 @@ paths:
       summary: publish and update draft
       tags:
       - Draft
+  /api/admin/img:
+    get:
+      consumes:
+      - application/json
+      description: get images by option
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: pageSize
+        in: query
+        name: pageSize
+        type: integer
+      - description: staticType
+        in: query
+        name: staticType
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.StaticPageResult'
+      summary: get images by option
+      tags:
+      - Static
+  /api/admin/img/:sign:
+    get:
+      consumes:
+      - application/json
+      description: delete image by sign
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete image by sign
+      tags:
+      - Static
+  /api/admin/img/all:
+    get:
+      consumes:
+      - application/json
+      description: get all images
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Static'
+            type: array
+      summary: get all images
+      tags:
+      - Static
+  /api/admin/img/all/delete:
+    get:
+      consumes:
+      - application/json
+      description: delete all images
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete all images
+      tags:
+      - Static
+  /api/admin/img/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload image
+      parameters:
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: waterMarkText
+        in: formData
+        name: waterMarkText
+        required: true
+        type: string
+      - description: withWaterMark
+        in: formData
+        name: withWaterMark
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: Upload image
+      tags:
+      - Static
+  /api/admin/isr:
+    get:
+      consumes:
+      - application/json
+      description: get isr setting
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.IsrSetting'
+      summary: get isr setting
+      tags:
+      - Isr
+    post:
+      consumes:
+      - application/json
+      description: active isr
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: active isr
+      tags:
+      - Isr
+    put:
+      consumes:
+      - application/json
+      description: update isr setting
+      parameters:
+      - description: isr
+        in: body
+        name: isr
+        required: true
+        schema:
+          $ref: '#/definitions/domain.IsrSetting'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Draft'
+      summary: update isr setting
+      tags:
+      - Isr
   /api/admin/meta:
     get:
       consumes:
@@ -1636,6 +1914,126 @@ paths:
       summary: get socials
       tags:
       - Social
+  /api/admin/pipeline:
+    get:
+      consumes:
+      - application/json
+      description: get all pipeline
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Pipeline'
+            type: array
+      summary: get all pipeline
+      tags:
+      - Pipeline
+    post:
+      consumes:
+      - application/json
+      description: create pipeline
+      parameters:
+      - description: pipeline
+        in: body
+        name: pipeline
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Pipeline'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: create pipeline
+      tags:
+      - Pipeline
+    put:
+      consumes:
+      - application/json
+      description: update pipeline
+      parameters:
+      - description: pipeline
+        in: body
+        name: pipeline
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Pipeline'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: update pipeline
+      tags:
+      - Pipeline
+  /api/admin/pipeline/:id:
+    delete:
+      consumes:
+      - application/json
+      description: delete pipeline
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: delete pipeline
+      tags:
+      - Pipeline
+    get:
+      consumes:
+      - application/json
+      description: get pipeline by id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Pipeline'
+      summary: get pipeline by id
+      tags:
+      - Pipeline
+  /api/admin/pipeline/config:
+    get:
+      consumes:
+      - application/json
+      description: get system default pipeline
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.EventItem'
+            type: array
+      summary: get system default pipeline
+      tags:
+      - Pipeline
+  /api/admin/pipeline/trigger/:id:
+    get:
+      consumes:
+      - application/json
+      description: trigger pipeline
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      summary: trigger pipeline
+      tags:
+      - Pipeline
   /api/admin/setting/layout:
     get:
       consumes:

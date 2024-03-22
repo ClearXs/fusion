@@ -127,9 +127,15 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		Cfg: cfg,
 		Db:  database,
 	}
+	fileService := &svr.FileService{
+		Cfg:              cfg,
+		StaticRepository: staticRepository,
+		SettingService:   settingService,
+	}
 	staticService := &svr.StaticService{
-		Cfg:        cfg,
-		StaticRepo: staticRepository,
+		Cfg:         cfg,
+		FileService: fileService,
+		StaticRepo:  staticRepository,
 	}
 	svrSettingService := svr.SettingService{
 		Cfg:         cfg,
@@ -172,6 +178,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		CaddyService:      caddyService,
 		CustomPageService: customPageService,
 		PipelineService:   pipelineService,
+		FileService:       fileService,
 	}
 	isrEventBus := event.NewIsrEventBus(service)
 	aboutRouter := &router.AboutRouter{
@@ -303,6 +310,11 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		SettingService: settingService,
 		Isr:            isrEventBus,
 	}
+	imgRouter := &router.ImgRouter{
+		Cfg:            cfg,
+		StaticService:  staticService,
+		SettingService: settingService,
+	}
 	routerRouter := &router.Router{
 		AboutRouter:        aboutRouter,
 		AnalysisRouter:     analysisRouter,
@@ -327,6 +339,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		PublicRouter:       publicRouter,
 		PipelineRouter:     pipelineRouter,
 		IsrRouter:          isrRouter,
+		ImgRouter:          imgRouter,
 	}
 	repository := &repo.Repository{
 		ArticleRepository:    articleRepository,
