@@ -3,13 +3,13 @@ package event
 import (
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/env"
-	"cc.allio/fusion/pkg/fetch"
 	"cc.allio/fusion/pkg/guc"
 	"github.com/asaskevich/EventBus"
 	"github.com/google/wire"
 	"github.com/samber/lo"
 	"github.com/sourcegraph/conc"
 	"golang.org/x/exp/slog"
+	"gopkg.in/h2non/gentleman.v2"
 	"strconv"
 	"strings"
 )
@@ -26,14 +26,14 @@ type IsrEventBus struct {
 
 var IsrEventBusSet = wire.NewSet(NewIsrEventBus)
 
-func NewIsrEventBus(Service *svr.Service) *IsrEventBus {
-	return &IsrEventBus{WebSiteUrl: env.WebSiteUrl, Bus: EventBus.New(), Service: Service}
+func NewIsrEventBus(bus EventBus.Bus, Service *svr.Service) *IsrEventBus {
+	return &IsrEventBus{WebSiteUrl: env.WebSiteUrl, Bus: bus, Service: Service}
 }
 
 // handle fetch to path
 func (isr *IsrEventBus) handle(path string, args ...interface{}) {
 	slog.Info("trigger isr rendering", "path", path, "args", args)
-	_, err := fetch.Get(isr.WebSiteUrl, fetch.D{{"path", path}})
+	_, err := gentleman.New().Get().Path(path).Param("path", path).Send()
 	if err != nil {
 		slog.Error("failed to trigger isr rendering", "path", path)
 	}
@@ -45,7 +45,7 @@ func (isr *IsrEventBus) retryHandle(retryCount int, path string, args ...interfa
 	var wg conc.WaitGroup
 	wg.Go(func() {
 		results := guc.Retry(retryCount, guc.DelayTimeout, func() error {
-			_, err := fetch.Get(isr.WebSiteUrl, fetch.D{{"path", path}})
+			_, err := gentleman.New().Get().Path(isr.WebSiteUrl).Param("path", path).Send()
 			if err != nil {
 				slog.Error("failed to trigger isr rendering", "path", path)
 			}

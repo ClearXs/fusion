@@ -2,6 +2,7 @@ package app
 
 import (
 	"cc.allio/fusion/config"
+	"cc.allio/fusion/internal/apm"
 	"cc.allio/fusion/internal/app/router"
 	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/repo"
@@ -17,6 +18,7 @@ type App struct {
 	Database   *mongo.Database
 	Isr        *event.IsrEventBus
 	Script     *event.ScriptEngine
+	Logger     *apm.Logger
 }
 
 func New(
@@ -27,6 +29,7 @@ func New(
 	database *mongo.Database,
 	isr *event.IsrEventBus,
 	script *event.ScriptEngine,
+	logger *apm.Logger,
 ) *App {
 	return &App{
 		Cfg:        cfg,
@@ -36,5 +39,6 @@ func New(
 		Database:   database,
 		Isr:        isr,
 		Script:     script,
+		Logger:     logger,
 	}
 }
