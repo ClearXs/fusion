@@ -13,7 +13,7 @@ var (
 )
 
 func init() {
-	Version = GetEnv("FUSION_VERSION", "")
+	Version = GetEnv("FUSION_VERSION", "v0.1.0")
 	FusionAllowDomains = GetEnv("FUSION_ALLOW_DOMAINS", "")
 	WebSiteUrl = GetEnv("WEB_SITE_URL", "http://127.0.0.1:3001/api/revalidate")
 }

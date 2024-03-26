@@ -10,6 +10,12 @@ demo: false
 log:
   path: /var/log
   level: debug
+  apm:
+    enable: true
+    url: http://43.143.195.208:5080
+    authorization: Basic amlhbmd3MTAyN0BnbWFpbC5jb206YWxsaW9AMjAyMw==
+    organization: default
+    stream: fusion
 
 codeRunner:
   path: /app/codeRunner

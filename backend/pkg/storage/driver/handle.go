@@ -8,6 +8,9 @@ import (
 // Handler 存储策略适配器
 type Handler interface {
 
+	// Init init storage handler
+	Init() error
+
 	// Upload file upload to dest path
 	Upload(ctx context.Context, file *storage.FileStream) error
 

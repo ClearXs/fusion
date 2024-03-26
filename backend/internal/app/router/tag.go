@@ -12,13 +12,13 @@ import (
 
 const TagPathPrefix = "/api/admin/tag"
 
-type TagRouter struct {
+type TagRoute struct {
 	Cfg        *config.Config
 	TagService *svr.TagService
 	Isr        *event.IsrEventBus
 }
 
-var TagRouterSet = wire.NewSet(wire.Struct(new(TagRouter), "*"))
+var TagRouterSet = wire.NewSet(wire.Struct(new(TagRoute), "*"))
 
 // GetAllTags
 // @Summary get all tags
@@ -29,7 +29,7 @@ var TagRouterSet = wire.NewSet(wire.Struct(new(TagRouter), "*"))
 // @Produce json
 // @Success 200 {object} []string
 // @Router /api/admin/tag/all [Get]
-func (t *TagRouter) GetAllTags(c *gin.Context) *R {
+func (t *TagRoute) GetAllTags(c *gin.Context) *R {
 	tags := t.TagService.GetAllTags(true)
 	return Ok(tags)
 }
@@ -43,7 +43,7 @@ func (t *TagRouter) GetAllTags(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} []domain.Article
 // @Router /api/admin/tag/:name [Get]
-func (t *TagRouter) GetArticlesByTagName(c *gin.Context) *R {
+func (t *TagRoute) GetArticlesByTagName(c *gin.Context) *R {
 	if t.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -62,7 +62,7 @@ func (t *TagRouter) GetArticlesByTagName(c *gin.Context) *R {
 // @Param        value   path      string  true  "value"
 // @Success 200 {object} bool
 // @Router /api/admin/tag/:name [Put]
-func (t *TagRouter) UpdateTagByName(c *gin.Context) *R {
+func (t *TagRoute) UpdateTagByName(c *gin.Context) *R {
 	if t.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -82,7 +82,7 @@ func (t *TagRouter) UpdateTagByName(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/tag/:name [Delete]
-func (t *TagRouter) DeleteTagByName(c *gin.Context) *R {
+func (t *TagRoute) DeleteTagByName(c *gin.Context) *R {
 	if t.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -92,7 +92,7 @@ func (t *TagRouter) DeleteTagByName(c *gin.Context) *R {
 	return Ok(result)
 }
 
-func (t *TagRouter) Register(r *gin.Engine) {
+func (t *TagRoute) Register(r *gin.Engine) {
 	r.GET(TagPathPrefix+"/all", Handle(t.GetAllTags))
 
 	r.GET(TagPathPrefix+"/:name", Handle(t.GetArticlesByTagName))

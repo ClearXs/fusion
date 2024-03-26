@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var config = Config{Url: "http://43.143.195.208:5080", Authorization: "Basic amlhbmd3MTAyN0BnbWFpbC5jb206YWxsaW9AMjAyMw==", Organization: "default", Stream: "fusion"}
+var config = LoggerConfig{Url: "http://43.143.195.208:5080", Authorization: "Basic amlhbmd3MTAyN0BnbWFpbC5jb206YWxsaW9AMjAyMw==", Organization: "default", Stream: "fusion"}
 var l = NewLogger(EventBus.New(), &config)
 
 func TestPushToOpenObserve(t *testing.T) {
@@ -17,12 +17,11 @@ func TestPushToOpenObserve(t *testing.T) {
 }
 
 func TestQueryOpenObserve(t *testing.T) {
-
 	a := assert.New(t)
 	Init(l)
 	search := NewSearch()
 	search.SQL("select * from fusion")
-	f, err := l.FindMap(search)
+	f, err := l.Find(search)
 	a.NoError(err)
 
 	a.NotNil(f)

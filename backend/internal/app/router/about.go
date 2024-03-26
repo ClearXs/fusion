@@ -12,13 +12,13 @@ import (
 
 const AboutPathPrefix = "/api/admin/meta/about"
 
-type AboutRouter struct {
+type AboutRoute struct {
 	Cfg     *config.Config
 	MetaSvr *svr.MetaService
 	Isr     *event.IsrEventBus
 }
 
-var AboutRouterSet = wire.NewSet(wire.Struct(new(AboutRouter), "*"))
+var AboutRouterSet = wire.NewSet(wire.Struct(new(AboutRoute), "*"))
 
 // GetAbout
 // @Summary 获取About
@@ -29,7 +29,7 @@ var AboutRouterSet = wire.NewSet(wire.Struct(new(AboutRouter), "*"))
 // @Produce json
 // @Success 200 {object} domain.Meta
 // @Router /api/admin/meta/about [Get]
-func (a *AboutRouter) GetAbout(c *gin.Context) *R {
+func (a *AboutRoute) GetAbout(c *gin.Context) *R {
 	meta := a.MetaSvr.GetMeta()
 	return Ok(meta)
 }
@@ -44,7 +44,7 @@ func (a *AboutRouter) GetAbout(c *gin.Context) *R {
 // @Param        content   path      string  true  "content"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/about [Put]
-func (a *AboutRouter) UpdateAbout(c *gin.Context) *R {
+func (a *AboutRoute) UpdateAbout(c *gin.Context) *R {
 	if a.Cfg.Demo {
 		return InternalError(errors.New("演示站禁止修改此项！"))
 	}
@@ -59,7 +59,7 @@ func (a *AboutRouter) UpdateAbout(c *gin.Context) *R {
 	return Ok(succeed)
 }
 
-func (a *AboutRouter) Register(r *gin.Engine) {
+func (a *AboutRoute) Register(r *gin.Engine) {
 	r.GET(AboutPathPrefix, Handle(a.GetAbout))
 	r.PUT(AboutPathPrefix, Handle(a.UpdateAbout))
 }

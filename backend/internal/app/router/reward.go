@@ -12,12 +12,12 @@ import (
 
 const RewardPathPrefix = "/api/admin/meta/reward"
 
-type RewardRouter struct {
+type RewardRoute struct {
 	Cfg         *config.Config
 	MetaService *svr.MetaService
 }
 
-var RewardRouterSet = wire.NewSet(wire.Struct(new(RewardRouter), "*"))
+var RewardRouterSet = wire.NewSet(wire.Struct(new(RewardRoute), "*"))
 
 // GetReward
 // @Summary get reward list
@@ -28,7 +28,7 @@ var RewardRouterSet = wire.NewSet(wire.Struct(new(RewardRouter), "*"))
 // @Produce json
 // @Success 200 {object} []domain.RewardItem
 // @Router /api/admin/meta/reward [Get]
-func (re *RewardRouter) GetReward(c *gin.Context) *R {
+func (re *RewardRoute) GetReward(c *gin.Context) *R {
 	rewards := re.MetaService.GetRewards()
 	return Ok(rewards)
 }
@@ -43,7 +43,7 @@ func (re *RewardRouter) GetReward(c *gin.Context) *R {
 // @Param        reward   body      domain.RewardItem   true  "reward"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/reward [Put]
-func (re *RewardRouter) UpdateReward(c *gin.Context) *R {
+func (re *RewardRoute) UpdateReward(c *gin.Context) *R {
 	if re.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -68,7 +68,7 @@ func (re *RewardRouter) UpdateReward(c *gin.Context) *R {
 // @Param        reward   body      domain.RewardItem   true  "reward"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/reward [Post]
-func (re *RewardRouter) CreateReward(c *gin.Context) *R {
+func (re *RewardRoute) CreateReward(c *gin.Context) *R {
 	if re.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -92,7 +92,7 @@ func (re *RewardRouter) CreateReward(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/meta/reward/:name [Delete]
-func (re *RewardRouter) DeleteReward(c *gin.Context) *R {
+func (re *RewardRoute) DeleteReward(c *gin.Context) *R {
 	if re.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -104,7 +104,7 @@ func (re *RewardRouter) DeleteReward(c *gin.Context) *R {
 	return Ok(deleted)
 }
 
-func (re *RewardRouter) Register(r *gin.Engine) {
+func (re *RewardRoute) Register(r *gin.Engine) {
 	r.GET(RewardPathPrefix, Handle(re.GetReward))
 	r.PUT(RewardPathPrefix, Handle(re.UpdateReward))
 	r.POST(RewardPathPrefix, Handle(re.CreateReward))

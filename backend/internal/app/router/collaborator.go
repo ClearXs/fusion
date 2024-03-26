@@ -11,14 +11,14 @@ import (
 
 const CollaboratorPathPrefix = "/api/admin/collaborator"
 
-type CollaboratorRouter struct {
+type CollaboratorRoute struct {
 	Cfg          *config.Config
 	UserService  *svr.UserService
 	MetaService  *svr.MetaService
 	TokenService *svr.TokenService
 }
 
-var CollaboratorRouterSet = wire.NewSet(wire.Struct(new(CollaboratorRouter), "*"))
+var CollaboratorRouterSet = wire.NewSet(wire.Struct(new(CollaboratorRoute), "*"))
 
 // GetAllCollaborators
 // @Summary get all collaborator
@@ -29,7 +29,7 @@ var CollaboratorRouterSet = wire.NewSet(wire.Struct(new(CollaboratorRouter), "*"
 // @Produce json
 // @Success 200 {object} []domain.User
 // @Router /api/admin/collaborator [Get]
-func (collaborator *CollaboratorRouter) GetAllCollaborators(c *gin.Context) *R {
+func (collaborator *CollaboratorRoute) GetAllCollaborators(c *gin.Context) *R {
 	collaborators := collaborator.UserService.GetAllCollaborators()
 	return Ok(collaborators)
 }
@@ -43,7 +43,7 @@ func (collaborator *CollaboratorRouter) GetAllCollaborators(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} []domain.User
 // @Router /api/admin/collaborator/list [Get]
-func (collaborator *CollaboratorRouter) GetAllCollaboratorsList(c *gin.Context) *R {
+func (collaborator *CollaboratorRoute) GetAllCollaboratorsList(c *gin.Context) *R {
 	siteInfo := collaborator.MetaService.GetSiteInfo()
 	admin := collaborator.UserService.GetUser()
 	collaborators := collaborator.UserService.GetAllCollaborators()
@@ -62,7 +62,7 @@ func (collaborator *CollaboratorRouter) GetAllCollaboratorsList(c *gin.Context) 
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/collaborator/:id [Delete]
-func (collaborator *CollaboratorRouter) DeleteCollaborator(c *gin.Context) *R {
+func (collaborator *CollaboratorRoute) DeleteCollaborator(c *gin.Context) *R {
 	id := web.ParseNumberForPath(c, "id", -1)
 	successed := collaborator.UserService.DeleteCollaborator(id)
 	return Ok(successed)
@@ -78,7 +78,7 @@ func (collaborator *CollaboratorRouter) DeleteCollaborator(c *gin.Context) *R {
 // @Param        user   body      domain.User   true  "user"
 // @Success 200 {object} bool
 // @Router /api/admin/collaborator [Post]
-func (collaborator *CollaboratorRouter) CreateCollaborator(c *gin.Context) *R {
+func (collaborator *CollaboratorRoute) CreateCollaborator(c *gin.Context) *R {
 	collaboratorUser := &domain.User{}
 	if err := c.Bind(collaboratorUser); err != nil {
 		return InternalError(err)
@@ -100,7 +100,7 @@ func (collaborator *CollaboratorRouter) CreateCollaborator(c *gin.Context) *R {
 // @Param        user   body      domain.User   true  "user"
 // @Success 200 {object} bool
 // @Router /api/admin/collaborator [Put]
-func (collaborator *CollaboratorRouter) UpdateCollaborator(c *gin.Context) *R {
+func (collaborator *CollaboratorRoute) UpdateCollaborator(c *gin.Context) *R {
 	collaboratorUser := &domain.User{}
 	if err := c.Bind(collaboratorUser); err != nil {
 		return InternalError(err)
@@ -112,7 +112,7 @@ func (collaborator *CollaboratorRouter) UpdateCollaborator(c *gin.Context) *R {
 	return Ok(successed)
 }
 
-func (collaborator *CollaboratorRouter) Register(r *gin.Engine) {
+func (collaborator *CollaboratorRoute) Register(r *gin.Engine) {
 	r.GET(CollaboratorPathPrefix, Handle(collaborator.GetAllCollaborators))
 
 	r.GET(CollaboratorPathPrefix+"/list", Handle(collaborator.GetAllCollaboratorsList))

@@ -7,19 +7,17 @@ import (
 	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/cache"
-	"cc.allio/fusion/pkg/util"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"github.com/samber/lo"
-	"golang.org/x/exp/slog"
 	"net/http"
 	"time"
 )
 
 const AuthPathPrefix = "/api/admin/auth"
 
-type AuthRouter struct {
+type AuthRoute struct {
 	Cfg      *config.Config
 	AuthSvr  *svr.AuthService
 	UserSvr  *svr.UserService
@@ -27,7 +25,7 @@ type AuthRouter struct {
 	Script   *event.ScriptEngine
 }
 
-var AuthRouterSet = wire.NewSet(wire.Struct(new(AuthRouter), "*"))
+var AuthRouterSet = wire.NewSet(wire.Struct(new(AuthRoute), "*"))
 
 // Login
 // @Summary 登陆
@@ -40,9 +38,7 @@ var AuthRouterSet = wire.NewSet(wire.Struct(new(AuthRouter), "*"))
 // @Param        password   path      string  true  "password"
 // @Success 200 {object} svr.TokenUser
 // @Router /api/admin/auth/login [Post]
-func (r *AuthRouter) Login(c *gin.Context) *R {
-	ip := util.GetIpByRequest(c.Request)
-	slog.Info("ip %s", ip)
+func (r *AuthRoute) Login(c *gin.Context) *R {
 	var loginCredential credential.LoginCredential
 	err := c.ShouldBind(&loginCredential)
 	if err != nil {
@@ -64,7 +60,7 @@ func (r *AuthRouter) Login(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {bool} bool
 // @Router /api/admin/auth/logout [GET]
-func (r *AuthRouter) Logout(c *gin.Context) *R {
+func (r *AuthRoute) Logout(c *gin.Context) *R {
 	token := c.GetHeader("token")
 	if lo.IsEmpty(token) {
 		return AuthenticationError(errors.New("无登录凭证"))
@@ -88,7 +84,7 @@ func (r *AuthRouter) Logout(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {bool} bool
 // @Router /api/admin/auth/restore [POST]
-func (r *AuthRouter) Restore(c *gin.Context) *R {
+func (r *AuthRoute) Restore(c *gin.Context) *R {
 	var restoreCredential credential.RestoreCredential
 	err := c.ShouldBind(&restoreCredential)
 	if err != nil {
@@ -118,7 +114,7 @@ func (r *AuthRouter) Restore(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {bool} bool
 // @Router /api/admin/auth [PUT]
-func (r *AuthRouter) UpdateUser(c *gin.Context) *R {
+func (r *AuthRoute) UpdateUser(c *gin.Context) *R {
 	if r.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改账号密码！"))
 	}
@@ -133,7 +129,7 @@ func (r *AuthRouter) UpdateUser(c *gin.Context) *R {
 	return Ok(updated)
 }
 
-func (ro *AuthRouter) Register(r *gin.Engine) {
+func (ro *AuthRoute) Register(r *gin.Engine) {
 	r.POST(AuthPathPrefix+"/login", Handle(ro.Login))
 	r.GET(AuthPathPrefix+"/logout", Handle(ro.Logout))
 	r.POST(AuthPathPrefix+"/restore", Handle(ro.Restore))

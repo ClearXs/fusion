@@ -15,7 +15,7 @@ import (
 
 const PublicPathPrefix = "/api/public"
 
-type PublicRouter struct {
+type PublicRoute struct {
 	Cfg               *config.Config
 	ArticleService    *svr.ArticleService
 	TagService        *svr.TagService
@@ -27,7 +27,7 @@ type PublicRouter struct {
 	CategoryService   *svr.CategoryService
 }
 
-var PublicRouterSet = wire.NewSet(wire.Struct(new(PublicRouter), "*"))
+var PublicRouterSet = wire.NewSet(wire.Struct(new(PublicRoute), "*"))
 
 // getAll
 // @Summary get custom page
@@ -38,7 +38,7 @@ var PublicRouterSet = wire.NewSet(wire.Struct(new(PublicRouter), "*"))
 // @Produce json
 // @Success 200 {object} []domain.CustomPage
 // @Router /api/public/customPage/all [Get]
-func (p *PublicRouter) getAll(c *gin.Context) *R {
+func (p *PublicRoute) getAll(c *gin.Context) *R {
 	customPages := p.CustomPageService.GetAll()
 	return Ok(customPages)
 }
@@ -53,7 +53,7 @@ func (p *PublicRouter) getAll(c *gin.Context) *R {
 // @Param        path   path      string  true  "path"
 // @Success 200 {object} domain.CustomPage
 // @Router /api/public/customPage [Get]
-func (p *PublicRouter) getOneByPath(c *gin.Context) *R {
+func (p *PublicRoute) getOneByPath(c *gin.Context) *R {
 	path := c.Query("path")
 	customPage := p.CustomPageService.GetByPath(path)
 	return Ok(customPage)
@@ -68,7 +68,7 @@ func (p *PublicRouter) getOneByPath(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} credential.AlternateArticle
 // @Router /api/public/search [Get]
-func (p *PublicRouter) getArticleByIdOrPathname(c *gin.Context) *R {
+func (p *PublicRoute) getArticleByIdOrPathname(c *gin.Context) *R {
 	idOrPathname := c.Param("id")
 	alternateArticle, err := p.ArticleService.GetArticleByIdOrPathnameWithAlternate(idOrPathname)
 	if err != nil {
@@ -86,7 +86,7 @@ func (p *PublicRouter) getArticleByIdOrPathname(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.Article
 // @Router /api/public/article/:id [Post]
-func (p *PublicRouter) getArticleByIdOrPathnameWithPassword(c *gin.Context) *R {
+func (p *PublicRoute) getArticleByIdOrPathnameWithPassword(c *gin.Context) *R {
 	idOrPathname := c.Param("id")
 	articlePasswordCredential := &credential.ArticlePasswordCredential{}
 	if err := c.Bind(articlePasswordCredential); err != nil {
@@ -106,7 +106,7 @@ func (p *PublicRouter) getArticleByIdOrPathnameWithPassword(c *gin.Context) *R {
 // @Param        value   path      string  true  "value"
 // @Success 200 {object} []domain.Article
 // @Router /api/public/search [Get]
-func (p *PublicRouter) searchArticle(c *gin.Context) *R {
+func (p *PublicRoute) searchArticle(c *gin.Context) *R {
 	text := c.Query("value")
 	articles := p.ArticleService.SearchByText(text, false)
 	return Ok(articles)
@@ -123,7 +123,7 @@ func (p *PublicRouter) searchArticle(c *gin.Context) *R {
 // @Param        isNewByPath   path      bool  true  "isNewByPath"
 // @Success 200 {object} []domain.Article
 // @Router /api/public/viewer [Post]
-func (p *PublicRouter) addViewer(c *gin.Context) *R {
+func (p *PublicRoute) addViewer(c *gin.Context) *R {
 	refer := c.Request.Header.Get("refer")
 	uri, err := url.ParseRequestURI(refer)
 	if err != nil {
@@ -148,7 +148,7 @@ func (p *PublicRouter) addViewer(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.DataViewer
 // @Router /api/public/viewer [Get]
-func (p *PublicRouter) getViewer(c *gin.Context) *R {
+func (p *PublicRoute) getViewer(c *gin.Context) *R {
 	viewer := p.MetaService.GetViewer()
 	return Ok(viewer)
 }
@@ -162,7 +162,7 @@ func (p *PublicRouter) getViewer(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.Visit
 // @Router /api/public/article/viewer/:id [Get]
-func (p *PublicRouter) getViewerByArticleIdOrPathname(c *gin.Context) *R {
+func (p *PublicRoute) getViewerByArticleIdOrPathname(c *gin.Context) *R {
 	idOrPathname := c.Param("id")
 	visit := p.VisitService.GetByArticleIdOrPathname(idOrPathname)
 	return Ok(visit)
@@ -177,7 +177,7 @@ func (p *PublicRouter) getViewerByArticleIdOrPathname(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} []credential.PublicArticle
 // @Router /api/public/tag/:name [Get]
-func (p *PublicRouter) getArticlesByTagName(c *gin.Context) *R {
+func (p *PublicRoute) getArticlesByTagName(c *gin.Context) *R {
 	tagName := c.Param("name")
 	articles := p.TagService.GetArticlesByTagName(tagName, false)
 	publicArticles := make([]*credential.PublicArticle, 0)
@@ -217,7 +217,7 @@ func (p *PublicRouter) getArticlesByTagName(c *gin.Context) *R {
 // @Param        endTime            query      int        false       "endTime"
 // @Success 200 {object} domain.ArticlePageResult
 // @Router /api/public/article [Get]
-func (p *PublicRouter) getByOption(c *gin.Context) *R {
+func (p *PublicRoute) getByOption(c *gin.Context) *R {
 	page := web.ParseNumberForQuery(c, "page", -1)
 	pageSize := web.ParseNumberForQuery(c, "pageSize", 5)
 	toListView := web.ParseBoolForQuery(c, "toListView", false)
@@ -255,7 +255,7 @@ func (p *PublicRouter) getByOption(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} any
 // @Router /api/public/timeline [Get]
-func (p *PublicRouter) getTimeLineInfo(c *gin.Context) *R {
+func (p *PublicRoute) getTimeLineInfo(c *gin.Context) *R {
 	timeLine := p.ArticleService.GetTimeLine()
 	return Ok(timeLine)
 }
@@ -269,7 +269,7 @@ func (p *PublicRouter) getTimeLineInfo(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} any
 // @Router /api/public/category [Get]
-func (p *PublicRouter) getArticlesByCategory(c *gin.Context) *R {
+func (p *PublicRoute) getArticlesByCategory(c *gin.Context) *R {
 	article := p.CategoryService.GetCategoriesWithArticle(false)
 	return Ok(article)
 }
@@ -283,7 +283,7 @@ func (p *PublicRouter) getArticlesByCategory(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} any
 // @Router /api/public/tag [Get]
-func (p *PublicRouter) getArticlesByTag(c *gin.Context) *R {
+func (p *PublicRoute) getArticlesByTag(c *gin.Context) *R {
 	article := p.TagService.GetTagsWithArticle(false)
 	return Ok(article)
 }
@@ -297,7 +297,7 @@ func (p *PublicRouter) getArticlesByTag(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} credential.SiteMeta
 // @Router /api/public/meta [Get]
-func (p *PublicRouter) getBuildMeta(c *gin.Context) *R {
+func (p *PublicRoute) getBuildMeta(c *gin.Context) *R {
 	tags := p.TagService.GetAllTags(false)
 	meta := p.MetaService.GetMeta()
 	categories := p.CategoryService.GetAllCategories()
@@ -352,7 +352,7 @@ func (p *PublicRouter) getBuildMeta(c *gin.Context) *R {
 	return Ok(siteMeta)
 }
 
-func (p *PublicRouter) Register(r *gin.Engine) {
+func (p *PublicRoute) Register(r *gin.Engine) {
 	r.GET(PublicPathPrefix+"/customPage/all", Handle(p.getAll))
 	r.GET(PublicPathPrefix+"/customPage", Handle(p.getOneByPath))
 	r.GET(PublicPathPrefix+"/article/:id", Handle(p.getArticleByIdOrPathname))

@@ -1320,6 +1320,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/admin/log": {
+            "get": {
+                "description": "get logs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log"
+                ],
+                "summary": "get logs",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "pageSize",
+                        "name": "pageSize",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "eventType",
+                        "name": "eventType",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apm.QueryResult"
+                        }
+                    }
+                }
+            }
+        },
         "/api/admin/meta": {
             "get": {
                 "description": "get meta info",
@@ -2897,6 +2940,21 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "apm.QueryResult": {
+            "type": "object",
+            "properties": {
+                "hits": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "credential.AlternateArticle": {
             "type": "object",
             "properties": {

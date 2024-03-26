@@ -14,14 +14,14 @@ import (
 
 const ArticlePathPrefix = "/api/admin/article"
 
-type ArticleRouter struct {
+type ArticleRoute struct {
 	Cfg        *config.Config
 	ArticleSvr *svr.ArticleService
 	Isr        *event.IsrEventBus
 	Script     *event.ScriptEngine
 }
 
-var ArticleRouterSet = wire.NewSet(wire.Struct(new(ArticleRouter), "*"))
+var ArticleRouterSet = wire.NewSet(wire.Struct(new(ArticleRoute), "*"))
 
 // GetArticleByOption
 // @Summary 根据参数获取文章
@@ -43,7 +43,7 @@ var ArticleRouterSet = wire.NewSet(wire.Struct(new(ArticleRouter), "*"))
 // @Param        endTime            query      int        false       "endTime"
 // @Success 200 {object} domain.ArticlePageResult
 // @Router /api/admin/article [Get]
-func (a *ArticleRouter) GetArticleByOption(c *gin.Context) *R {
+func (a *ArticleRoute) GetArticleByOption(c *gin.Context) *R {
 	page := web.ParseNumberForQuery(c, "page", -1)
 	pageSize := web.ParseNumberForQuery(c, "pageSize", 5)
 	toListView := web.ParseBoolForQuery(c, "toListView", false)
@@ -81,7 +81,7 @@ func (a *ArticleRouter) GetArticleByOption(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.ArticlePageResult
 // @Router /api/admin/article/:id [Get]
-func (a *ArticleRouter) GetOneById(c *gin.Context) *R {
+func (a *ArticleRoute) GetOneById(c *gin.Context) *R {
 	id := web.ParseNumberForPath(c, "id", -1)
 	article := a.ArticleSvr.GetById(int64(id))
 	return Ok(article)
@@ -97,7 +97,7 @@ func (a *ArticleRouter) GetOneById(c *gin.Context) *R {
 // @Param       request     body      domain.Article   true     "query params"
 // @Success 200 {object} bool
 // @Router /api/admin/article/:id [PUT]
-func (a *ArticleRouter) UpdateArticleById(c *gin.Context) *R {
+func (a *ArticleRoute) UpdateArticleById(c *gin.Context) *R {
 	if a.Cfg.Demo {
 		return Error(401, errors.New("演示站禁止修改文章！！"))
 	}
@@ -124,7 +124,7 @@ func (a *ArticleRouter) UpdateArticleById(c *gin.Context) *R {
 // @Param       request     body      domain.Article   true     "query params"
 // @Success 200 {object} bool
 // @Router /api/admin/article/:id [POST]
-func (a *ArticleRouter) CreateArticle(c *gin.Context) *R {
+func (a *ArticleRoute) CreateArticle(c *gin.Context) *R {
 	if a.Cfg.Demo {
 		return Error(401, errors.New("演示站禁止创建文章！！"))
 	}
@@ -152,7 +152,7 @@ func (a *ArticleRouter) CreateArticle(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/article/:id [DELETE]
-func (a *ArticleRouter) DeleteArticle(c *gin.Context) *R {
+func (a *ArticleRoute) DeleteArticle(c *gin.Context) *R {
 	if a.Cfg.Demo {
 		return Error(401, errors.New("演示站禁止删除文章！！！"))
 	}
@@ -172,7 +172,7 @@ func (a *ArticleRouter) DeleteArticle(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.Article
 // @Router /api/admin/article/searchByLink [POST]
-func (a *ArticleRouter) GetArticlesByLink(c *gin.Context) *R {
+func (a *ArticleRoute) GetArticlesByLink(c *gin.Context) *R {
 	var searchArticleLink = &credential.ArticleSearchLinkCredential{}
 	err := c.Bind(searchArticleLink)
 	if err != nil {
@@ -182,7 +182,7 @@ func (a *ArticleRouter) GetArticlesByLink(c *gin.Context) *R {
 	return Ok(articles)
 }
 
-func (a *ArticleRouter) Register(r *gin.Engine) {
+func (a *ArticleRoute) Register(r *gin.Engine) {
 	r.GET(ArticlePathPrefix, Handle(a.GetArticleByOption))
 	r.GET(ArticlePathPrefix+"/:id", Handle(a.GetOneById))
 	r.PUT(ArticlePathPrefix+"/:id", Handle(a.UpdateArticleById))

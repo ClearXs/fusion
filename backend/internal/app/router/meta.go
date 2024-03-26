@@ -12,12 +12,12 @@ import (
 
 const MetaPathPrefix = "/api/admin/meta"
 
-type MetaRouter struct {
+type MetaRoute struct {
 	Cfg         *config.Config
 	MetaService *svr.MetaService
 }
 
-var MetaRouterSet = wire.NewSet(wire.Struct(new(MetaRouter), "*"))
+var MetaRouterSet = wire.NewSet(wire.Struct(new(MetaRoute), "*"))
 
 // GetAllMeta
 // @Summary get meta info
@@ -28,7 +28,7 @@ var MetaRouterSet = wire.NewSet(wire.Struct(new(MetaRouter), "*"))
 // @Produce json
 // @Success 200 {object} credential.MetaCredential
 // @Router /api/admin/meta [Get]
-func (m *MetaRouter) GetAllMeta(c *gin.Context) *R {
+func (m *MetaRoute) GetAllMeta(c *gin.Context) *R {
 	meta := m.MetaService.GetMeta()
 	return Ok(&credential.MetaCredential{
 		Version:       env.Version,
@@ -40,6 +40,6 @@ func (m *MetaRouter) GetAllMeta(c *gin.Context) *R {
 	})
 }
 
-func (m *MetaRouter) Register(r *gin.Engine) {
+func (m *MetaRoute) Register(r *gin.Engine) {
 	r.GET(MetaPathPrefix, Handle(m.GetAllMeta))
 }

@@ -13,7 +13,7 @@ import (
 
 const BackupPathPrefix = "/api/admin/backup"
 
-type BackupRouter struct {
+type BackupRoute struct {
 	Cfg         *config.Config
 	UserSvr     *svr.UserService
 	MetaSvr     *svr.MetaService
@@ -27,7 +27,7 @@ type BackupRouter struct {
 	StaticSvr   *svr.StaticService
 }
 
-var BackupRouterSet = wire.NewSet(wire.Struct(new(BackupRouter), "*"))
+var BackupRouterSet = wire.NewSet(wire.Struct(new(BackupRoute), "*"))
 
 // ExportBackup
 // @Summary 导出系统数据
@@ -38,7 +38,7 @@ var BackupRouterSet = wire.NewSet(wire.Struct(new(BackupRouter), "*"))
 // @Produce json
 // @Success 200 {object} nil
 // @Router /api/admin/backup/export [Get]
-func (a *BackupRouter) ExportBackup(c *gin.Context) *R {
+func (a *BackupRoute) ExportBackup(c *gin.Context) *R {
 	backup := &Backup{}
 	{
 		articles := a.ArticleSvr.GetAll("admin", true, false)
@@ -106,7 +106,7 @@ func (a *BackupRouter) ExportBackup(c *gin.Context) *R {
 // @Param        file              formData      file        true       "file"
 // @Success 200 {object} nil
 // @Router /api/admin/backup/import [Post]
-func (a *BackupRouter) ImportBackup(c *gin.Context) *R {
+func (a *BackupRoute) ImportBackup(c *gin.Context) *R {
 	filePart, err := c.FormFile("file")
 	if err != nil {
 		return InternalError(err)
@@ -128,7 +128,7 @@ func (a *BackupRouter) ImportBackup(c *gin.Context) *R {
 	return nil
 }
 
-func (a *BackupRouter) Register(r *gin.Engine) {
+func (a *BackupRoute) Register(r *gin.Engine) {
 	r.GET(BackupPathPrefix+"/export", Handle(a.ExportBackup))
 	r.POST(BackupPathPrefix+"/import", Handle(a.ImportBackup))
 }

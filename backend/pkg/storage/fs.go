@@ -1,30 +1,9 @@
 package storage
 
 import (
-	"cc.allio/fusion/pkg/storage/driver"
-	"cc.allio/fusion/pkg/storage/driver/local"
-	"errors"
 	"io"
 	"time"
 )
-
-type FileSystem struct {
-	Policy  *Policy
-	Handler driver.Handler
-}
-
-func NewFs(policy *Policy) *FileSystem {
-	return &FileSystem{Policy: policy}
-}
-
-func (fs *FileSystem) LoadHandler() error {
-	switch fs.Policy.Mode {
-	case LocalMode:
-		fs.Handler = local.NewLocalDriver(fs.Policy)
-		return nil
-	}
-	return errors.New("not found any policy load handler")
-}
 
 // FileStream describe file info
 type FileStream struct {

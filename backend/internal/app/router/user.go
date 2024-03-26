@@ -9,12 +9,12 @@ import (
 
 const UserPrefix = "/api/admin/user"
 
-type UserRouter struct {
+type UserRoute struct {
 	Cfg     *config.Config
 	UserSvr *svr.UserService
 }
 
-var UserRouterSet = wire.NewSet(wire.Struct(new(UserRouter), "*"))
+var UserRouterSet = wire.NewSet(wire.Struct(new(UserRoute), "*"))
 
 // GetUserList
 // @Summary 获取用户列表
@@ -25,11 +25,11 @@ var UserRouterSet = wire.NewSet(wire.Struct(new(UserRouter), "*"))
 // @Produce json
 // @Success 200 {object} domain.User
 // @Router /api/admin/user/list [Get]
-func (u *UserRouter) GetUserList(c *gin.Context) *R {
+func (u *UserRoute) GetUserList(c *gin.Context) *R {
 	userList := u.UserSvr.GetUserList()
 	return Ok(userList)
 }
 
-func (u *UserRouter) Register(r *gin.Engine) {
+func (u *UserRoute) Register(r *gin.Engine) {
 	r.GET(UserPrefix+"/list", Handle(u.GetUserList))
 }

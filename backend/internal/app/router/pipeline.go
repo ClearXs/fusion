@@ -13,13 +13,13 @@ import (
 
 const pipelinePathPrefix = "/api/admin/pipeline"
 
-type PipelineRouter struct {
+type PipelineRoute struct {
 	Cfg             *config.Config
 	PipelineService *svr.PipelineService
 	Script          *event.ScriptEngine
 }
 
-var PipelineRouterSet = wire.NewSet(wire.Struct(new(PipelineRouter), "*"))
+var PipelineRouterSet = wire.NewSet(wire.Struct(new(PipelineRoute), "*"))
 
 // GetAllPipelines
 // @Summary get all pipeline
@@ -30,7 +30,7 @@ var PipelineRouterSet = wire.NewSet(wire.Struct(new(PipelineRouter), "*"))
 // @Produce json
 // @Success 200 {object} []domain.Pipeline
 // @Router /api/admin/pipeline [Get]
-func (p *PipelineRouter) GetAllPipelines(c *gin.Context) *R {
+func (p *PipelineRoute) GetAllPipelines(c *gin.Context) *R {
 	pipelines := p.PipelineService.GetAll()
 	return Ok(pipelines)
 }
@@ -44,7 +44,7 @@ func (p *PipelineRouter) GetAllPipelines(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} []domain.EventItem
 // @Router /api/admin/pipeline/config [Get]
-func (p *PipelineRouter) GetPipelineConfig(c *gin.Context) *R {
+func (p *PipelineRoute) GetPipelineConfig(c *gin.Context) *R {
 	return Ok(domain.SystemEvents)
 }
 
@@ -57,7 +57,7 @@ func (p *PipelineRouter) GetPipelineConfig(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.Pipeline
 // @Router /api/admin/pipeline/:id [Get]
-func (p *PipelineRouter) GetPipelineById(c *gin.Context) *R {
+func (p *PipelineRoute) GetPipelineById(c *gin.Context) *R {
 	id := web.ParseNumberForPath(c, "id", -1)
 	pipeline, err := p.PipelineService.GetPipelineById(int64(id))
 	if err != nil {
@@ -76,7 +76,7 @@ func (p *PipelineRouter) GetPipelineById(c *gin.Context) *R {
 // @Param        pipeline   body      domain.Pipeline   true  "pipeline"
 // @Success 200 {object} bool
 // @Router /api/admin/pipeline [Post]
-func (p *PipelineRouter) CreatePipeline(c *gin.Context) *R {
+func (p *PipelineRoute) CreatePipeline(c *gin.Context) *R {
 	pipeline := &domain.Pipeline{}
 	if err := c.Bind(pipeline); err != nil {
 		return InternalError(err)
@@ -97,7 +97,7 @@ func (p *PipelineRouter) CreatePipeline(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/pipeline/:id [Delete]
-func (p *PipelineRouter) DeletePipeline(c *gin.Context) *R {
+func (p *PipelineRoute) DeletePipeline(c *gin.Context) *R {
 	id := web.ParseNumberForPath(c, "id", -1)
 	success, err := p.PipelineService.DeletePipeline(int64(id))
 	if err != nil {
@@ -116,7 +116,7 @@ func (p *PipelineRouter) DeletePipeline(c *gin.Context) *R {
 // @Param        pipeline   body      domain.Pipeline   true  "pipeline"
 // @Success 200 {object} bool
 // @Router /api/admin/pipeline [Put]
-func (p *PipelineRouter) UpdatePipeline(c *gin.Context) *R {
+func (p *PipelineRoute) UpdatePipeline(c *gin.Context) *R {
 	pipeline := &domain.Pipeline{}
 	if err := c.Bind(pipeline); err != nil {
 		return InternalError(err)
@@ -137,7 +137,7 @@ func (p *PipelineRouter) UpdatePipeline(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/pipeline/trigger/:id [Get]
-func (p *PipelineRouter) TriggerPipeline(c *gin.Context) *R {
+func (p *PipelineRoute) TriggerPipeline(c *gin.Context) *R {
 	id := web.ParseNumberForPath(c, "id", -1)
 	triggerPipeline := &credential.TriggerPipelineCredential{}
 	if err := c.Bind(triggerPipeline); err != nil {
@@ -147,7 +147,7 @@ func (p *PipelineRouter) TriggerPipeline(c *gin.Context) *R {
 	return Ok(true)
 }
 
-func (p *PipelineRouter) Register(r *gin.Engine) {
+func (p *PipelineRoute) Register(r *gin.Engine) {
 	r.GET(pipelinePathPrefix, Handle(p.GetAllPipelines))
 	r.GET(pipelinePathPrefix+"/config", Handle(p.GetPipelineConfig))
 	r.GET(pipelinePathPrefix+"/:id", Handle(p.GetPipelineById))

@@ -12,7 +12,18 @@ func TestValidateLogic(t *testing.T) {
 	coll := db.Collection("user")
 	orPredicate := NewLogicalOr()
 	orPredicate.Append(bson.E{Key: "name", Value: "test"})
-	orFilter := orPredicate.GetBson()
+	orFilter := orPredicate.ToBson()
 	_, err := coll.Find(context.TODO(), orFilter)
 	assert.Empty(t, err)
+}
+
+func TestToJsonString(t *testing.T) {
+	a := assert.New(t)
+
+	logical := NewLogical()
+	logical.Append(bson.E{Key: "a", Value: "b"})
+
+	r1 := logical.ToJsonString()
+
+	a.Equal("{\"key\":\"$and\",\"value\":{\"a\":\"b\"}}", r1)
 }

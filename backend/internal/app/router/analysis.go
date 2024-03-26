@@ -11,12 +11,12 @@ import (
 
 const AnalysisPathPrefix = "/api/admin/analysis"
 
-type AnalysisRouter struct {
+type AnalysisRoute struct {
 	Cfg         *config.Config
 	AnalysisSvr *svr.AnalysisService
 }
 
-var AnalysisRouterSet = wire.NewSet(wire.Struct(new(AnalysisRouter), "*"))
+var AnalysisRouterSet = wire.NewSet(wire.Struct(new(AnalysisRoute), "*"))
 
 // GetWelcomePageData
 // @Summary 获取首页统计数据
@@ -30,7 +30,7 @@ var AnalysisRouterSet = wire.NewSet(wire.Struct(new(AnalysisRouter), "*"))
 // @Param        overviewDataNum    query      int         false      "overviewDataNum"
 // @Param        articleTabDataNum  query      int         false      "articleTabDataNum"
 // @Router /api/admin/analysis [Get]
-func (a *AnalysisRouter) GetWelcomePageData(c *gin.Context) *R {
+func (a *AnalysisRoute) GetWelcomePageData(c *gin.Context) *R {
 	tab := c.Query("tab")
 	if tab == "overview" {
 		viewerDataNum := web.ParseNumberForQuery(c, "viewerDataNum", 0)
@@ -49,6 +49,6 @@ func (a *AnalysisRouter) GetWelcomePageData(c *gin.Context) *R {
 	}
 }
 
-func (a *AnalysisRouter) Register(r *gin.Engine) {
+func (a *AnalysisRoute) Register(r *gin.Engine) {
 	r.GET(AnalysisPathPrefix, Handle(a.GetWelcomePageData))
 }

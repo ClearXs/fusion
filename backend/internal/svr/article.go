@@ -375,7 +375,9 @@ func (a *ArticleService) GetAll(view ArticleView, includeHidden bool, includeDel
 		orLogic = orLogic.AppendArray(HiddenFilter)
 	}
 	filter.AppendLogical(orLogic)
-	opt := options.FindOptions{Sort: bson.E{Key: "createAt", Value: -1}}
+
+	sort := mongodb.MakeSort("createdAt", mongodb.Descending)
+	opt := options.FindOptions{Sort: sort}
 	articles, err := a.ArticleRepo.FindList(filter, &opt)
 	if err != nil {
 		slog.Error(err.Error())
@@ -611,9 +613,12 @@ func (a *ArticleService) UpdateViewerByPathname(pathname string, isNew bool) {
 
 func (a *ArticleService) GetTimeLine() map[string][]*domain.Article {
 	filter := mongodb.NewLogical()
+	// append default domain model
 	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(DeleteFilter))
 	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(HiddenFilter))
-	opt := &options.FindOptions{Sort: bson.E{Key: "createAt", Value: -1}}
+	// sort
+	sort := mongodb.MakeSort("createdAt", mongodb.Descending)
+	opt := &options.FindOptions{Sort: sort}
 	articles, err := a.ArticleRepo.FindList(filter, opt)
 	if err != nil {
 		return map[string][]*domain.Article{}

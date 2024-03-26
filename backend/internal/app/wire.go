@@ -21,8 +21,8 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 	panic(wire.Build(
 		New,
 		mongodbConnect,
-		createEventBus(),
-		apm.LoggerSet,
+		NewEventBus,
+		NewApmLogger,
 		repo.RepositorySet,
 		svr.ServiceSet,
 		router.Set,
@@ -35,6 +35,12 @@ func mongodbConnect(cfg *config.Config) (*mongo.Database, func(), error) {
 	return mongodb.Connect(&cfg.Mongodb)
 }
 
-func createEventBus() EventBus.Bus {
-	return &EventBus.New()
+func NewEventBus() EventBus.Bus {
+	return EventBus.New()
+}
+
+func NewApmLogger(bus EventBus.Bus, cfg *config.Config) *apm.Logger {
+	logger := apm.NewLogger(bus, &cfg.Log.Apm)
+	apm.Init(logger)
+	return logger
 }

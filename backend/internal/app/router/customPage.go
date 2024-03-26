@@ -7,13 +7,13 @@ import (
 	"github.com/google/wire"
 )
 
-type CustomPageRouter struct {
+type CustomPageRoute struct {
 	Cfg           *config.Config
 	StaticService *svr.StaticService
 }
 
-var CustomPageRouterSet = wire.NewSet(wire.Struct(new(CustomPageRouter), "*"))
+var CustomPageRouterSet = wire.NewSet(wire.Struct(new(CustomPageRoute), "*"))
 
-func (c *CustomPageRouter) Register(r *gin.Engine) {
+func (c *CustomPageRoute) Register(r *gin.Engine) {
 
 }

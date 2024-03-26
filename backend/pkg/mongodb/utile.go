@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
+	"golang.org/x/exp/slog"
 )
 
 type Predicate = string
@@ -21,11 +22,13 @@ type Logical interface {
 	AppendArray(ele bson.D) Logical
 	// AppendLogical 追加逻辑谓词
 	AppendLogical(other Logical) Logical
-	// GetBson 获取加上逻辑谓词的bson数据
-	GetBson() bson.E
+	// ToBson 获取加上逻辑谓词的bson数据
+	ToBson() bson.E
+	// ToJsonString to json
+	ToJsonString() string
 }
 
-type LogicImpl struct {
+type LogicalImpl struct {
 	predicate  Predicate
 	additional []bson.E
 }
@@ -52,7 +55,7 @@ func NewLogicalDefaultLogical(other Logical) Logical {
 
 // NewLogicalOr 创建逻辑or谓词
 func NewLogicalOr() Logical {
-	return &LogicImpl{predicate: Or, additional: make([]bson.E, 0)}
+	return &LogicalImpl{predicate: Or, additional: make([]bson.E, 0)}
 }
 
 // NewLogicalOrDefault 创建逻辑or谓词
@@ -78,7 +81,7 @@ func NewLogicalOrDefaultLogical(other Logical) Logical {
 
 // NewLogicalAnd 创建逻辑and谓词
 func NewLogicalAnd() Logical {
-	return &LogicImpl{predicate: And, additional: make([]bson.E, 0)}
+	return &LogicalImpl{predicate: And, additional: make([]bson.E, 0)}
 }
 
 // NewLogicalAndDefault 创建逻辑and谓词
@@ -104,7 +107,7 @@ func NewLogicalAndDefaultLogical(other Logical) Logical {
 
 // NewLogicalNor 创建逻辑nor谓词
 func NewLogicalNor() Logical {
-	return &LogicImpl{predicate: Nor, additional: make([]bson.E, 0)}
+	return &LogicalImpl{predicate: Nor, additional: make([]bson.E, 0)}
 }
 
 // NewLogicalNorDefault 创建逻辑nor谓词
@@ -128,28 +131,38 @@ func NewLogicalNorDefaultLogical(other Logical) Logical {
 	return logical
 }
 
-func (logic *LogicImpl) GetPredicate() Predicate {
+func (logic *LogicalImpl) GetPredicate() Predicate {
 	return logic.predicate
 }
 
-func (logic *LogicImpl) Append(ele bson.E) Logical {
+func (logic *LogicalImpl) Append(ele bson.E) Logical {
 	logic.additional = append(logic.additional, ele)
 	return logic
 }
 
-func (logic *LogicImpl) AppendArray(ele bson.D) Logical {
+func (logic *LogicalImpl) AppendArray(ele bson.D) Logical {
 	logic.additional = append(logic.additional, ele...)
 	return logic
 }
 
-func (logic *LogicImpl) AppendLogical(other Logical) Logical {
-	logic.additional = append(logic.additional, other.GetBson())
+func (logic *LogicalImpl) AppendLogical(other Logical) Logical {
+	logic.additional = append(logic.additional, other.ToBson())
 	return logic
 }
 
-func (logic *LogicImpl) GetBson() bson.E {
+func (logic *LogicalImpl) ToBson() bson.E {
 	if len(logic.additional) == 0 {
 		return bson.E{}
 	}
 	return bson.E{Key: logic.predicate, Value: logic.additional}
+}
+
+func (logic *LogicalImpl) ToJsonString() string {
+	b := logic.ToBson()
+	jsonBytes, err := bson.MarshalExtJSON(b, true, true)
+	if err != nil {
+		slog.Error("Failed to marshal bson to json", "err", err, "bson", b)
+		return ""
+	}
+	return string(jsonBytes)
 }

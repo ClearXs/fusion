@@ -13,14 +13,14 @@ import (
 
 const SitePathPrefix = "/api/admin/meta/site"
 
-type SiteRouter struct {
+type SiteRoute struct {
 	Cfg         *config.Config
 	MetaService *svr.MetaService
 	Isr         *event.IsrEventBus
 	Script      *event.ScriptEngine
 }
 
-var SiteRouterSet = wire.NewSet(wire.Struct(new(SiteRouter), "*"))
+var SiteRouterSet = wire.NewSet(wire.Struct(new(SiteRoute), "*"))
 
 // GetSite
 // @Summary get site
@@ -31,7 +31,7 @@ var SiteRouterSet = wire.NewSet(wire.Struct(new(SiteRouter), "*"))
 // @Produce json
 // @Success 200 {object} domain.SiteInfo
 // @Router /api/admin/meta/site [Get]
-func (s *SiteRouter) GetSite(c *gin.Context) *R {
+func (s *SiteRoute) GetSite(c *gin.Context) *R {
 	siteInfo := s.MetaService.GetSiteInfo()
 	return Ok(siteInfo)
 }
@@ -46,7 +46,7 @@ func (s *SiteRouter) GetSite(c *gin.Context) *R {
 // @Param        site   body      domain.SiteInfo   true  "site"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/site [Put]
-func (s *SiteRouter) UpdateSite(c *gin.Context) *R {
+func (s *SiteRoute) UpdateSite(c *gin.Context) *R {
 	if s.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -60,7 +60,7 @@ func (s *SiteRouter) UpdateSite(c *gin.Context) *R {
 	return Ok(successed)
 }
 
-func (s *SiteRouter) Register(r *gin.Engine) {
+func (s *SiteRoute) Register(r *gin.Engine) {
 	r.GET(SitePathPrefix, Handle(s.GetSite))
 	r.PUT(SitePathPrefix, Handle(s.UpdateSite))
 }

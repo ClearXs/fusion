@@ -15,30 +15,31 @@ type Register interface {
 }
 
 type Router struct {
-	AboutRouter        *AboutRouter
-	AnalysisRouter     *AnalysisRouter
-	ArticleRouter      *ArticleRouter
-	AuthRouter         *AuthRouter
-	BackupRouter       *BackupRouter
-	UserRouter         *UserRouter
-	CaddyRouter        *CaddyRouter
-	CategoryRouter     *CategoryRouter
-	CollaboratorRouter *CollaboratorRouter
-	CustomPageRouter   *CustomPageRouter
-	DraftRouter        *DraftRouter
-	LinkRouter         *LinkRouter
-	MenuRouter         *MenuRouter
-	MetaRouter         *MetaRouter
-	RewardRouter       *RewardRouter
-	SettingRouter      *SettingRouter
-	SiteRouter         *SiteRouter
-	SocialRouter       *SocialRouter
-	TagRouter          *TagRouter
-	TokenRouter        *TokenRouter
-	PublicRouter       *PublicRouter
-	PipelineRouter     *PipelineRouter
-	IsrRouter          *IsrRouter
-	ImgRouter          *ImgRouter
+	AboutRouter        *AboutRoute
+	AnalysisRouter     *AnalysisRoute
+	ArticleRouter      *ArticleRoute
+	AuthRouter         *AuthRoute
+	BackupRouter       *BackupRoute
+	UserRouter         *UserRoute
+	CaddyRouter        *CaddyRoute
+	CategoryRouter     *CategoryRoute
+	CollaboratorRouter *CollaboratorRoute
+	CustomPageRouter   *CustomPageRoute
+	DraftRouter        *DraftRoute
+	LinkRouter         *LinkRoute
+	MenuRouter         *MenuRoute
+	MetaRouter         *MetaRoute
+	RewardRouter       *RewardRoute
+	SettingRouter      *SettingRoute
+	SiteRouter         *SiteRoute
+	SocialRouter       *SocialRoute
+	TagRouter          *TagRoute
+	TokenRouter        *TokenRoute
+	PublicRouter       *PublicRoute
+	PipelineRouter     *PipelineRoute
+	IsrRouter          *IsrRoute
+	ImgRouter          *ImgRoute
+	LogRoute           *LogRoute
 }
 
 var Set = wire.NewSet(
@@ -66,6 +67,7 @@ var Set = wire.NewSet(
 	PipelineRouterSet,
 	IsrRouterSet,
 	ImgRouterSet,
+	LogRouteSet,
 	wire.Struct(new(Router), "*"),
 )
 
@@ -111,6 +113,7 @@ func (router *Router) Init(r *gin.Engine) {
 		router.PipelineRouter.Register(r)
 		router.IsrRouter.Register(r)
 		router.ImgRouter.Register(r)
+		router.LogRoute.Register(r)
 	}
 
 	// route or method not found

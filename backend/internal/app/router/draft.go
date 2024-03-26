@@ -15,14 +15,14 @@ import (
 
 const DraftPathPrefix = "/api/admin/draft"
 
-type DraftRouter struct {
+type DraftRoute struct {
 	Cfg          *config.Config
 	DraftService *svr.DraftService
 	Isr          *event.IsrEventBus
 	Script       *event.ScriptEngine
 }
 
-var DraftRouterSet = wire.NewSet(wire.Struct(new(DraftRouter), "*"))
+var DraftRouterSet = wire.NewSet(wire.Struct(new(DraftRoute), "*"))
 
 // GetDraftByOption
 // @Summary get drafts by options
@@ -42,7 +42,7 @@ var DraftRouterSet = wire.NewSet(wire.Struct(new(DraftRouter), "*"))
 // @Param        endTime            query      int        false       "endTime"
 // @Success 200 {object} domain.DraftPageResult
 // @Router /api/admin/draft [Get]
-func (d *DraftRouter) GetDraftByOption(c *gin.Context) *R {
+func (d *DraftRoute) GetDraftByOption(c *gin.Context) *R {
 	page := web.ParseNumberForQuery(c, "page", -1)
 	pageSize := web.ParseNumberForQuery(c, "pageSize", 5)
 	toListView := web.ParseBoolForQuery(c, "toListView", false)
@@ -76,7 +76,7 @@ func (d *DraftRouter) GetDraftByOption(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.Draft
 // @Router /api/admin/draft/:id [Get]
-func (d *DraftRouter) GetDraft(c *gin.Context) *R {
+func (d *DraftRoute) GetDraft(c *gin.Context) *R {
 	id := web.ParseNumberForQuery(c, "id", -1)
 	draft, err := d.DraftService.GetById(int64(id))
 	if err != nil {
@@ -95,7 +95,7 @@ func (d *DraftRouter) GetDraft(c *gin.Context) *R {
 // @Param        draft   body      domain.Draft   true  "draft"
 // @Success 200 {object} bool
 // @Router /api/admin/draft/:id [Put]
-func (d *DraftRouter) UpdateDraft(c *gin.Context) *R {
+func (d *DraftRoute) UpdateDraft(c *gin.Context) *R {
 	draft := &domain.Draft{}
 	if err := c.Bind(draft); err != nil {
 		return InternalError(err)
@@ -120,7 +120,7 @@ func (d *DraftRouter) UpdateDraft(c *gin.Context) *R {
 // @Param        draft   body      domain.Draft   true  "draft"
 // @Success 200 {object} domain.Draft
 // @Router /api/admin/draft [Post]
-func (d *DraftRouter) CreateDraft(c *gin.Context) *R {
+func (d *DraftRoute) CreateDraft(c *gin.Context) *R {
 	draft := &domain.Draft{}
 	if err := c.Bind(draft); err != nil {
 		return InternalError(err)
@@ -143,7 +143,7 @@ func (d *DraftRouter) CreateDraft(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/draft/:id [Delete]
-func (d *DraftRouter) DeleteDraft(c *gin.Context) *R {
+func (d *DraftRoute) DeleteDraft(c *gin.Context) *R {
 	id := web.ParseNumberForQuery(c, "id", -1)
 	successed, err := d.DraftService.DeleteById(int64(id))
 	if err != nil {
@@ -163,7 +163,7 @@ func (d *DraftRouter) DeleteDraft(c *gin.Context) *R {
 // @Param        draft   body      domain.Draft   true  "draft"
 // @Success 200 {object} domain.Draft
 // @Router /api/admin/draft/publish/:id [Post]
-func (d *DraftRouter) PublishDraft(c *gin.Context) *R {
+func (d *DraftRoute) PublishDraft(c *gin.Context) *R {
 	if d.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止发布草稿！"))
 	}
@@ -182,7 +182,7 @@ func (d *DraftRouter) PublishDraft(c *gin.Context) *R {
 	return Ok(newDraft)
 }
 
-func (d *DraftRouter) Register(r *gin.Engine) {
+func (d *DraftRoute) Register(r *gin.Engine) {
 	r.GET(DraftPathPrefix, Handle(d.GetDraftByOption))
 
 	r.GET(DraftPathPrefix+"/:id", Handle(d.GetDraft))

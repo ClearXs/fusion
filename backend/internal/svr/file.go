@@ -6,6 +6,7 @@ import (
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/img"
 	"cc.allio/fusion/pkg/storage"
+	"cc.allio/fusion/pkg/storage/filesystem"
 	"context"
 	"github.com/google/wire"
 	"golang.org/x/exp/slog"
@@ -94,9 +95,12 @@ func (f *FileService) createPolicyBySetting() *storage.Policy {
 	}
 }
 
-func (f *FileService) chooseFs(policy *storage.Policy) (*storage.FileSystem, error) {
-	newFs := storage.NewFs(policy)
+func (f *FileService) chooseFs(policy *storage.Policy) (*filesystem.FileSystem, error) {
+	newFs := filesystem.NewFs(policy)
 	// load handler
 	err := newFs.LoadHandler()
-	return newFs, err
+	if err != nil {
+		return nil, err
+	}
+	return newFs, nil
 }

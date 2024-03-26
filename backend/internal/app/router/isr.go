@@ -11,13 +11,13 @@ import (
 
 const isrPathPrefix = "/api/admin/isr"
 
-type IsrRouter struct {
+type IsrRoute struct {
 	Cfg            *config.Config
 	SettingService *svr.SettingService
 	Isr            *event.IsrEventBus
 }
 
-var IsrRouterSet = wire.NewSet(wire.Struct(new(IsrRouter), "*"))
+var IsrRouterSet = wire.NewSet(wire.Struct(new(IsrRoute), "*"))
 
 // ActiveAll
 // @Summary active isr
@@ -28,7 +28,7 @@ var IsrRouterSet = wire.NewSet(wire.Struct(new(IsrRouter), "*"))
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/isr [Post]
-func (i *IsrRouter) ActiveAll(c *gin.Context) *R {
+func (i *IsrRoute) ActiveAll(c *gin.Context) *R {
 	i.Isr.ActiveAll("trigger incremental rendering by manual")
 	return Ok(true)
 }
@@ -43,7 +43,7 @@ func (i *IsrRouter) ActiveAll(c *gin.Context) *R {
 // @Param        isr   body      domain.IsrSetting   true  "isr"
 // @Success 200 {object} domain.Draft
 // @Router /api/admin/isr [Put]
-func (i *IsrRouter) UpdateIsrSetting(c *gin.Context) *R {
+func (i *IsrRoute) UpdateIsrSetting(c *gin.Context) *R {
 	isrSetting := &domain.IsrSetting{}
 	if err := c.Bind(isrSetting); err != nil {
 		return InternalError(err)
@@ -64,12 +64,12 @@ func (i *IsrRouter) UpdateIsrSetting(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.IsrSetting
 // @Router /api/admin/isr [Get]
-func (i *IsrRouter) GetIsrSetting(c *gin.Context) *R {
+func (i *IsrRoute) GetIsrSetting(c *gin.Context) *R {
 	isrSetting := i.SettingService.FindIsrSetting()
 	return Ok(isrSetting)
 }
 
-func (i *IsrRouter) Register(r *gin.Engine) {
+func (i *IsrRoute) Register(r *gin.Engine) {
 	r.POST(isrPathPrefix, Handle(i.ActiveAll))
 	r.PUT(isrPathPrefix, Handle(i.UpdateIsrSetting))
 	r.GET(isrPathPrefix, Handle(i.GetIsrSetting))

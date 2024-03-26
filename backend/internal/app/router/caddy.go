@@ -13,13 +13,13 @@ import (
 
 const CaddyPathPrefix = "/api/admin/caddy"
 
-type CaddyRouter struct {
+type CaddyRoute struct {
 	Cfg             *config.Config
 	SettingsService *svr.SettingService
 	CaddyService    *svr.CaddyService
 }
 
-var CaddyRouterSet = wire.NewSet(wire.Struct(new(CaddyRouter), "*"))
+var CaddyRouterSet = wire.NewSet(wire.Struct(new(CaddyRoute), "*"))
 
 // GetHttpsSettings
 // @Summary acquire https settings
@@ -30,7 +30,7 @@ var CaddyRouterSet = wire.NewSet(wire.Struct(new(CaddyRouter), "*"))
 // @Produce json
 // @Success 200 {object} domain.HttpSetting
 // @Router /api/admin/caddy/https [Get]
-func (caddy *CaddyRouter) GetHttpsSettings(c *gin.Context) *R {
+func (caddy *CaddyRoute) GetHttpsSettings(c *gin.Context) *R {
 	httpsSetting := caddy.SettingsService.FindHttpsSetting()
 	return Ok(httpsSetting)
 }
@@ -45,7 +45,7 @@ func (caddy *CaddyRouter) GetHttpsSettings(c *gin.Context) *R {
 // @Param        httpsSettingCredential   body      credential.HttpsSettingCredential   true  "httpsSettingCredential"
 // @Success 200 {object} bool
 // @Router /api/admin/caddy/https [Put]
-func (caddy *CaddyRouter) updateHttpsSettings(c *gin.Context) *R {
+func (caddy *CaddyRoute) updateHttpsSettings(c *gin.Context) *R {
 	if caddy.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -74,7 +74,7 @@ func (caddy *CaddyRouter) updateHttpsSettings(c *gin.Context) *R {
 // @Param        domain   path    string   true  "domain"
 // @Success 200 {object} nil
 // @Router /api/admin/caddy/ask [Get]
-func (caddy *CaddyRouter) askOnDemand(c *gin.Context) *R {
+func (caddy *CaddyRoute) askOnDemand(c *gin.Context) *R {
 	domain := c.Param("domain")
 	isIpV4 := ip.IsIpV4(domain)
 	if !isIpV4 {
@@ -92,7 +92,7 @@ func (caddy *CaddyRouter) askOnDemand(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} string
 // @Router /api/admin/caddy/log [Get]
-func (caddy *CaddyRouter) getLog(c *gin.Context) *R {
+func (caddy *CaddyRoute) getLog(c *gin.Context) *R {
 	// TODO 未知/var/log/caddy.log是什么用
 	log, err := caddy.CaddyService.GetLog()
 	if err != nil {
@@ -110,7 +110,7 @@ func (caddy *CaddyRouter) getLog(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} nil
 // @Router /api/admin/caddy/log [Delete]
-func (caddy *CaddyRouter) clearLog(c *gin.Context) *R {
+func (caddy *CaddyRoute) clearLog(c *gin.Context) *R {
 	// TODO 未知/var/log/caddy.log是什么用
 	if caddy.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
@@ -128,7 +128,7 @@ func (caddy *CaddyRouter) clearLog(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} string
 // @Router /api/admin/caddy/config [Get]
-func (caddy *CaddyRouter) getCaddyConfig(c *gin.Context) *R {
+func (caddy *CaddyRoute) getCaddyConfig(c *gin.Context) *R {
 	// TODO 未知 http://127.0.0.1:2019/config是什么接口
 	cfg, err := caddy.CaddyService.GetConfig()
 	if err != nil {
@@ -137,7 +137,7 @@ func (caddy *CaddyRouter) getCaddyConfig(c *gin.Context) *R {
 	return Ok(cfg)
 }
 
-func (caddy *CaddyRouter) Register(r *gin.Engine) {
+func (caddy *CaddyRoute) Register(r *gin.Engine) {
 	r.GET(CaddyPathPrefix+"https", Handle(caddy.GetHttpsSettings))
 	r.PUT(CaddyPathPrefix+"https", Handle(caddy.updateHttpsSettings))
 

@@ -13,12 +13,12 @@ import (
 
 const TokenPathPrefix = "/api/admin/token"
 
-type TokenRouter struct {
+type TokenRoute struct {
 	Cfg          *config.Config
 	TokenService *svr.TokenService
 }
 
-var TokenRouterSet = wire.NewSet(wire.Struct(new(TokenRouter), "*"))
+var TokenRouterSet = wire.NewSet(wire.Struct(new(TokenRoute), "*"))
 
 // GetAllApiTokens
 // @Summary get all tokens
@@ -29,7 +29,7 @@ var TokenRouterSet = wire.NewSet(wire.Struct(new(TokenRouter), "*"))
 // @Produce json
 // @Success 200 {object} []domain.Token
 // @Router /api/admin/token [Get]
-func (t *TokenRouter) GetAllApiTokens(c *gin.Context) *R {
+func (t *TokenRoute) GetAllApiTokens(c *gin.Context) *R {
 	tokens := t.TokenService.FindAllApiToken()
 	return Ok(tokens)
 }
@@ -44,7 +44,7 @@ func (t *TokenRouter) GetAllApiTokens(c *gin.Context) *R {
 // @Param        tokenCredential   body      credential.TokenCredential   true  "tokenCredential"
 // @Success 200 {object} string
 // @Router /api/admin/token [Post]
-func (t *TokenRouter) CreateApiToken(c *gin.Context) *R {
+func (t *TokenRoute) CreateApiToken(c *gin.Context) *R {
 	if t.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -68,7 +68,7 @@ func (t *TokenRouter) CreateApiToken(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/token/:id [Delete]
-func (t *TokenRouter) DeleteApiToken(c *gin.Context) *R {
+func (t *TokenRoute) DeleteApiToken(c *gin.Context) *R {
 	if t.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -80,7 +80,7 @@ func (t *TokenRouter) DeleteApiToken(c *gin.Context) *R {
 	return Ok(success)
 }
 
-func (t *TokenRouter) Register(r *gin.Engine) {
+func (t *TokenRoute) Register(r *gin.Engine) {
 	r.GET(TokenPathPrefix, Handle(t.GetAllApiTokens))
 	r.POST(TokenPathPrefix, Handle(t.CreateApiToken))
 	r.DELETE(TokenPathPrefix+"/:id", Handle(t.DeleteApiToken))

@@ -22,13 +22,13 @@ import (
 
 const imagePathPrefix = "/api/admin/img"
 
-type ImgRouter struct {
+type ImgRoute struct {
 	Cfg            *config.Config
 	StaticService  *svr.StaticService
 	SettingService *svr.SettingService
 }
 
-var ImgRouterSet = wire.NewSet(wire.Struct(new(ImgRouter), "*"))
+var ImgRouterSet = wire.NewSet(wire.Struct(new(ImgRoute), "*"))
 
 // Upload
 // @Summary Upload image
@@ -42,7 +42,7 @@ var ImgRouterSet = wire.NewSet(wire.Struct(new(ImgRouter), "*"))
 // @Param       withWaterMark     formData     bool       true     "withWaterMark"
 // @Success 200 {object} bool
 // @Router /api/admin/img/upload [POST]
-func (i *ImgRouter) Upload(c *gin.Context) *R {
+func (i *ImgRoute) Upload(c *gin.Context) *R {
 	// create context
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -98,7 +98,7 @@ func (i *ImgRouter) Upload(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} []domain.Static
 // @Router /api/admin/img/all [Get]
-func (i *ImgRouter) GetAll(c *gin.Context) *R {
+func (i *ImgRoute) GetAll(c *gin.Context) *R {
 	statics := i.StaticService.GetAll(domain.ImgStaticType)
 	return Ok(statics)
 }
@@ -112,7 +112,7 @@ func (i *ImgRouter) GetAll(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/img/all/delete [Get]
-func (i *ImgRouter) DeleteAll(c *gin.Context) *R {
+func (i *ImgRoute) DeleteAll(c *gin.Context) *R {
 	if i.Cfg.Demo {
 		return Error(401, errors.New("演示站禁止操作！！"))
 	}
@@ -136,7 +136,7 @@ func (i *ImgRouter) DeleteAll(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/img/:sign [Get]
-func (i *ImgRouter) DeleteBySign(c *gin.Context) *R {
+func (i *ImgRoute) DeleteBySign(c *gin.Context) *R {
 	if i.Cfg.Demo {
 		return Error(401, errors.New("演示站禁止操作！！"))
 	}
@@ -163,7 +163,7 @@ func (i *ImgRouter) DeleteBySign(c *gin.Context) *R {
 // @Param        staticType           query      int        false       "staticType"          "img"
 // @Success 200 {object} domain.StaticPageResult
 // @Router /api/admin/img [Get]
-func (i *ImgRouter) GetByOption(c *gin.Context) *R {
+func (i *ImgRoute) GetByOption(c *gin.Context) *R {
 	option := &credential.StaticSearchOption{}
 	if err := c.Bind(option); err != nil {
 		return InternalError(err)
@@ -173,7 +173,7 @@ func (i *ImgRouter) GetByOption(c *gin.Context) *R {
 }
 
 // addWatermark by file and text
-func (i *ImgRouter) addWatermark(file multipart.File, text string, format imaging.Format) (io.Reader, error) {
+func (i *ImgRoute) addWatermark(file multipart.File, text string, format imaging.Format) (io.Reader, error) {
 	watermark, err := img.NewWatermark(file)
 	if err != nil {
 		return nil, err
@@ -188,7 +188,7 @@ func (i *ImgRouter) addWatermark(file multipart.File, text string, format imagin
 	return reader, nil
 }
 
-func (i *ImgRouter) Register(r *gin.Engine) {
+func (i *ImgRoute) Register(r *gin.Engine) {
 	r.POST(imagePathPrefix+"/upload", Handle(i.Upload))
 	r.GET(imagePathPrefix+"/all", Handle(i.GetAll))
 	r.DELETE(imagePathPrefix+"/all/delete", Handle(i.DeleteAll))

@@ -15,13 +15,13 @@ import (
 
 const CategoryPathPrefix = "/api/admin/category"
 
-type CategoryRouter struct {
+type CategoryRoute struct {
 	Cfg             *config.Config
 	CategoryService *svr.CategoryService
 	Isr             *event.IsrEventBus
 }
 
-var CategoryRouterSet = wire.NewSet(wire.Struct(new(CategoryRouter), "*"))
+var CategoryRouterSet = wire.NewSet(wire.Struct(new(CategoryRoute), "*"))
 
 // GetAllTags
 // @Summary get all category tags
@@ -32,7 +32,7 @@ var CategoryRouterSet = wire.NewSet(wire.Struct(new(CategoryRouter), "*"))
 // @Produce json
 // @Success 200 {object} nil
 // @Router /api/admin/category/all [Get]
-func (category *CategoryRouter) GetAllTags(c *gin.Context) *R {
+func (category *CategoryRoute) GetAllTags(c *gin.Context) *R {
 	withDetails := web.ParseBoolForQuery(c, "detail", false)
 	if withDetails {
 		categories := category.CategoryService.GetAllCategories()
@@ -52,7 +52,7 @@ func (category *CategoryRouter) GetAllTags(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} []domain.Article
 // @Router /api/admin/category/:name [Get]
-func (category *CategoryRouter) GetArticlesByName(c *gin.Context) *R {
+func (category *CategoryRoute) GetArticlesByName(c *gin.Context) *R {
 	name := c.Param("name")
 	articles := category.CategoryService.GetArticlesByCategory(name, true)
 	return Ok(articles)
@@ -68,7 +68,7 @@ func (category *CategoryRouter) GetArticlesByName(c *gin.Context) *R {
 // @Param        credential   body      credential.CategoryCredential   true  "credential"
 // @Success 200 {object} bool
 // @Router /api/admin/category [Post]
-func (category *CategoryRouter) CreateCategory(c *gin.Context) *R {
+func (category *CategoryRoute) CreateCategory(c *gin.Context) *R {
 	if category.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -93,7 +93,7 @@ func (category *CategoryRouter) CreateCategory(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/category/:name [Delete]
-func (category *CategoryRouter) DeleteCategory(c *gin.Context) *R {
+func (category *CategoryRoute) DeleteCategory(c *gin.Context) *R {
 	if category.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -119,7 +119,7 @@ func (category *CategoryRouter) DeleteCategory(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/category/:name [Put]
-func (category *CategoryRouter) UpdateCategory(c *gin.Context) *R {
+func (category *CategoryRoute) UpdateCategory(c *gin.Context) *R {
 	if category.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -135,7 +135,7 @@ func (category *CategoryRouter) UpdateCategory(c *gin.Context) *R {
 	return Ok(updated)
 }
 
-func (category *CategoryRouter) Register(r *gin.Engine) {
+func (category *CategoryRoute) Register(r *gin.Engine) {
 	r.GET(CategoryPathPrefix+"all", Handle(category.GetAllTags))
 
 	r.GET(CategoryPathPrefix+"/:name", Handle(category.GetArticlesByName))

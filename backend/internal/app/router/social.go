@@ -13,13 +13,13 @@ import (
 
 const SocialPathPrefix = "/api/admin/meta/social"
 
-type SocialRouter struct {
+type SocialRoute struct {
 	Cfg         *config.Config
 	MetaService *svr.MetaService
 	Isr         *event.IsrEventBus
 }
 
-var SocialRouterSet = wire.NewSet(wire.Struct(new(SocialRouter), "*"))
+var SocialRouterSet = wire.NewSet(wire.Struct(new(SocialRoute), "*"))
 
 // GetSocials
 // @Summary get socials
@@ -30,7 +30,7 @@ var SocialRouterSet = wire.NewSet(wire.Struct(new(SocialRouter), "*"))
 // @Produce json
 // @Success 200 {object} []domain.SocialItem
 // @Router /api/admin/meta/social [Get]
-func (s *SocialRouter) GetSocials(c *gin.Context) *R {
+func (s *SocialRoute) GetSocials(c *gin.Context) *R {
 	socials := s.MetaService.GetSocials()
 	return Ok(socials)
 }
@@ -44,7 +44,7 @@ func (s *SocialRouter) GetSocials(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} []domain.SocialItem
 // @Router /api/admin/meta/social/types [Get]
-func (s *SocialRouter) GetSocialTypes(c *gin.Context) *R {
+func (s *SocialRoute) GetSocialTypes(c *gin.Context) *R {
 	socials := s.MetaService.GetDefaultSocials()
 	return Ok(socials)
 }
@@ -59,7 +59,7 @@ func (s *SocialRouter) GetSocialTypes(c *gin.Context) *R {
 // @Param        social   body      domain.SocialItem   true  "social"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/social [Put]
-func (s *SocialRouter) UpdateSocial(c *gin.Context) *R {
+func (s *SocialRoute) UpdateSocial(c *gin.Context) *R {
 	if s.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -85,7 +85,7 @@ func (s *SocialRouter) UpdateSocial(c *gin.Context) *R {
 // @Param        social   body      domain.SocialItem   true  "social"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/social [Post]
-func (s *SocialRouter) CreateSocial(c *gin.Context) *R {
+func (s *SocialRoute) CreateSocial(c *gin.Context) *R {
 	if s.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -110,7 +110,7 @@ func (s *SocialRouter) CreateSocial(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/meta/social/:type [Delete]
-func (s *SocialRouter) DeleteSocial(c *gin.Context) *R {
+func (s *SocialRoute) DeleteSocial(c *gin.Context) *R {
 	if s.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -123,7 +123,7 @@ func (s *SocialRouter) DeleteSocial(c *gin.Context) *R {
 	return Ok(successed)
 }
 
-func (s *SocialRouter) Register(r *gin.Engine) {
+func (s *SocialRoute) Register(r *gin.Engine) {
 	r.GET(SocialPathPrefix, Handle(s.GetSocials))
 	r.GET(SocialPathPrefix+"/types", Handle(s.GetSocialTypes))
 	r.PUT(SocialPathPrefix, Handle(s.UpdateSocial))

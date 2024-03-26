@@ -6,11 +6,20 @@ import (
 	"fmt"
 	"github.com/asaskevich/EventBus"
 	"github.com/goccy/go-json"
-	"github.com/google/wire"
-	"golang.org/x/exp/slog"
+	"go.mongodb.org/mongo-driver/bson"
 	"gopkg.in/h2non/gentleman.v2"
 	"net/http"
+	"os"
 	"time"
+)
+
+// log type contains system business
+
+type LogType = string
+
+const (
+	BusinessLogType LogType = "business"
+	SystemLogType   LogType = "system"
 )
 
 // impl OpenObserve
@@ -18,11 +27,30 @@ import (
 
 type Logger struct {
 	bus    EventBus.Bus
-	config *Config
+	config *LoggerConfig
 	client *gentleman.Client
 }
 
-type Config struct {
+// Write combine apm logger and std output
+func (l *Logger) Write(p []byte) (n int, err error) {
+	// publish to apm
+	// restructure record
+	record := make(map[string]any)
+	err = json.Unmarshal(p, &record)
+	if err != nil {
+		l.Put(string(p))
+	} else {
+		// add log type
+		record["logType"] = SystemLogType
+		l.Put(record)
+	}
+	// print to std output
+	return os.Stdout.Write(p)
+}
+
+type LoggerConfig struct {
+	// Enable to record log info
+	Enable bool `yaml:"enable"`
 	// Url for OpenObserve
 	Url           string `yaml:"url"`
 	Organization  string `yaml:"organization"`
@@ -32,7 +60,7 @@ type Config struct {
 
 const collectTopic = "/fusion/apm/logger"
 
-func NewLogger(bus EventBus.Bus, config *Config) *Logger {
+func NewLogger(bus EventBus.Bus, config *LoggerConfig) *Logger {
 	return &Logger{bus: bus, config: config, client: gentleman.New()}
 }
 
@@ -40,11 +68,14 @@ func Init(logger *Logger) {
 	bus := logger.bus
 	err := bus.SubscribeAsync(collectTopic, handlePut, true)
 	if err != nil {
-		slog.Error("Failed to subscribe topic", "topic", collectTopic)
+		fmt.Println("Failed to subscribe topic", "topic", collectTopic)
 	}
 }
 
-var LoggerSet = wire.NewSet(NewLogger, Init)
+// Record bson.D type log
+func (l *Logger) Record(log bson.D) {
+	l.Put(log)
+}
 
 // Put to APM System for OpenObserver base on event-bus
 func (l *Logger) Put(v interface{}) {
@@ -52,17 +83,21 @@ func (l *Logger) Put(v interface{}) {
 }
 
 func handlePut(logger *Logger, v interface{}) {
-	slog.Debug("handle log send to OpenObserve", "log", v)
+	if !logger.config.Enable {
+		// ignore...
+		return
+	}
+
 	bytes, err := json.Marshal(v)
 	if err != nil {
-		slog.Error("Failed to serialization log", "err", err)
+		fmt.Println("Failed to serialization log", "err", err)
 		return
 	}
 	client := logger.client
 	config := logger.config
 	// /api/{organization}/{stream}/_json
 	path := fmt.Sprintf("/api/%s/%s/_json", config.Organization, config.Stream)
-	res, err := client.Post().
+	_, err = client.Post().
 		URL(config.Url).
 		Path(path).
 		SetHeader("Content-Type", "application/json").
@@ -71,12 +106,8 @@ func handlePut(logger *Logger, v interface{}) {
 		Body(bytes2.NewBuffer(bytes)).
 		Send()
 	if err != nil {
-		slog.Error("Failed to send log. ", "err", err)
+		fmt.Println("Failed to send log. ", "err", err)
 	}
-
-	// record send information
-	data := string(res.Bytes())
-	slog.Debug("send log", "ok status", res.Ok, "data", data)
 }
 
 type QueryResult struct {
@@ -84,8 +115,8 @@ type QueryResult struct {
 	Total int64            `json:"total"`
 }
 
-// FindMap query APM Logger system for OpenObserve
-func (l *Logger) FindMap(search *Search) (Formatter[QueryResult], error) {
+// Find query APM Logger system for OpenObserve
+func (l *Logger) Find(search *Search) (Formatter[QueryResult], error) {
 	config := l.config
 	client := l.client
 
@@ -93,8 +124,7 @@ func (l *Logger) FindMap(search *Search) (Formatter[QueryResult], error) {
 	path := fmt.Sprintf("/api/%s/_search", config.Organization)
 	requestData, err := json.Marshal(search)
 
-	slog.Debug("Query log data for OpenObserver", "path", path, "request", string(requestData))
-
+	fmt.Println("Query log data for OpenObserver", "path", path, "request", string(requestData))
 	if err != nil {
 		return nil, err
 	}
@@ -109,13 +139,13 @@ func (l *Logger) FindMap(search *Search) (Formatter[QueryResult], error) {
 		Send()
 
 	if err != nil {
-		slog.Error("Failed query log data", "err", err)
+		fmt.Println("Failed query log data", "err", err)
 		return nil, err
 	}
 
 	if !res.Ok || res.StatusCode != http.StatusOK {
 		failedMessage := fmt.Sprintf("Failed to query log data for OpenObserver, path: [%s]  message: [%s], status code: [%d]", path, res.String(), res.StatusCode)
-		slog.Error(failedMessage)
+		fmt.Println(failedMessage)
 		return nil, errors.New(failedMessage)
 	}
 

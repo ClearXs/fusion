@@ -7,7 +7,3 @@ const (
 	AscSort  SortOrder = "asc"
 	DescSort SortOrder = "desc"
 )
-
-type Entity struct {
-	Id int64 `bson:"id" json:"id"`
-}

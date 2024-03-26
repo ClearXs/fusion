@@ -8,12 +8,14 @@ package app
 
 import (
 	"cc.allio/fusion/config"
+	"cc.allio/fusion/internal/apm"
 	"cc.allio/fusion/internal/app/router"
 	"cc.allio/fusion/internal/event"
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/internal/svr"
 	"cc.allio/fusion/pkg/mongodb"
 	"context"
+	"github.com/asaskevich/EventBus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -51,6 +53,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		VisitRepo:     visitRepository,
 		ArticleRepo:   articleRepository,
 	}
+	bus := NewEventBus()
 	userRepository := &repo.UserRepository{
 		Cfg: cfg,
 		Db:  database,
@@ -76,10 +79,17 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		SettingsSvr: settingService,
 		TokenRepo:   tokenRepository,
 	}
+	logger := NewApmLogger(bus, cfg)
+	logService := &svr.LogService{
+		Cfg:    cfg,
+		Logger: logger,
+	}
 	authService := &svr.AuthService{
 		Cfg:          cfg,
 		UserService:  userService,
 		TokenService: tokenService,
+		LogService:   logService,
+		Logger:       logger,
 	}
 	categoryRepository := &repo.CategoryRepository{
 		Cfg: cfg,
@@ -179,32 +189,33 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		CustomPageService: customPageService,
 		PipelineService:   pipelineService,
 		FileService:       fileService,
+		LogService:        logService,
 	}
-	isrEventBus := event.NewIsrEventBus(service)
-	aboutRouter := &router.AboutRouter{
+	isrEventBus := event.NewIsrEventBus(bus, service)
+	aboutRoute := &router.AboutRoute{
 		Cfg:     cfg,
 		MetaSvr: metaService,
 		Isr:     isrEventBus,
 	}
-	analysisRouter := &router.AnalysisRouter{
+	analysisRoute := &router.AnalysisRoute{
 		Cfg:         cfg,
 		AnalysisSvr: analysisService,
 	}
 	scriptEngine := event.NewScripEngine(pipelineService)
-	articleRouter := &router.ArticleRouter{
+	articleRoute := &router.ArticleRoute{
 		Cfg:        cfg,
 		ArticleSvr: articleService,
 		Isr:        isrEventBus,
 		Script:     scriptEngine,
 	}
-	authRouter := &router.AuthRouter{
+	authRoute := &router.AuthRoute{
 		Cfg:      cfg,
 		AuthSvr:  authService,
 		UserSvr:  userService,
 		TokenSvr: tokenService,
 		Script:   scriptEngine,
 	}
-	backupRouter := &router.BackupRouter{
+	backupRoute := &router.BackupRoute{
 		Cfg:         cfg,
 		UserSvr:     userService,
 		MetaSvr:     metaService,
@@ -217,79 +228,79 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		SettingSvr:  settingService,
 		StaticSvr:   staticService,
 	}
-	userRouter := &router.UserRouter{
+	userRoute := &router.UserRoute{
 		Cfg:     cfg,
 		UserSvr: userService,
 	}
-	caddyRouter := &router.CaddyRouter{
+	caddyRoute := &router.CaddyRoute{
 		Cfg:             cfg,
 		SettingsService: settingService,
 		CaddyService:    caddyService,
 	}
-	categoryRouter := &router.CategoryRouter{
+	categoryRoute := &router.CategoryRoute{
 		Cfg:             cfg,
 		CategoryService: categoryService,
 		Isr:             isrEventBus,
 	}
-	collaboratorRouter := &router.CollaboratorRouter{
+	collaboratorRoute := &router.CollaboratorRoute{
 		Cfg:          cfg,
 		UserService:  userService,
 		MetaService:  metaService,
 		TokenService: tokenService,
 	}
-	customPageRouter := &router.CustomPageRouter{
+	customPageRoute := &router.CustomPageRoute{
 		Cfg:           cfg,
 		StaticService: staticService,
 	}
-	draftRouter := &router.DraftRouter{
+	draftRoute := &router.DraftRoute{
 		Cfg:          cfg,
 		DraftService: draftService,
 		Isr:          isrEventBus,
 		Script:       scriptEngine,
 	}
-	linkRouter := &router.LinkRouter{
+	linkRoute := &router.LinkRoute{
 		Cfg:         cfg,
 		MetaService: metaService,
 	}
-	menuRouter := &router.MenuRouter{
+	menuRoute := &router.MenuRoute{
 		Cfg:             cfg,
 		SettingsService: settingService,
 		Isr:             isrEventBus,
 	}
-	metaRouter := &router.MetaRouter{
+	metaRoute := &router.MetaRoute{
 		Cfg:         cfg,
 		MetaService: metaService,
 	}
-	rewardRouter := &router.RewardRouter{
+	rewardRoute := &router.RewardRoute{
 		Cfg:         cfg,
 		MetaService: metaService,
 	}
-	settingRouter := &router.SettingRouter{
+	settingRoute := &router.SettingRoute{
 		Cfg:            cfg,
 		SettingService: settingService,
 		Isr:            isrEventBus,
 	}
-	siteRouter := &router.SiteRouter{
+	siteRoute := &router.SiteRoute{
 		Cfg:         cfg,
 		MetaService: metaService,
 		Isr:         isrEventBus,
 		Script:      scriptEngine,
 	}
-	socialRouter := &router.SocialRouter{
+	socialRoute := &router.SocialRoute{
 		Cfg:         cfg,
 		MetaService: metaService,
 		Isr:         isrEventBus,
 	}
-	tagRouter := &router.TagRouter{
+	tagRoute := &router.TagRoute{
 		Cfg:        cfg,
 		TagService: tagService,
 		Isr:        isrEventBus,
 	}
-	tokenRouter := &router.TokenRouter{
+	tokenRoute := &router.TokenRoute{
 		Cfg:          cfg,
 		TokenService: tokenService,
 	}
-	publicRouter := &router.PublicRouter{
+	publicRoute := &router.PublicRoute{
 		Cfg:               cfg,
 		ArticleService:    articleService,
 		TagService:        tagService,
@@ -300,46 +311,51 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		CustomPageService: customPageService,
 		CategoryService:   categoryService,
 	}
-	pipelineRouter := &router.PipelineRouter{
+	pipelineRoute := &router.PipelineRoute{
 		Cfg:             cfg,
 		PipelineService: pipelineService,
 		Script:          scriptEngine,
 	}
-	isrRouter := &router.IsrRouter{
+	isrRoute := &router.IsrRoute{
 		Cfg:            cfg,
 		SettingService: settingService,
 		Isr:            isrEventBus,
 	}
-	imgRouter := &router.ImgRouter{
+	imgRoute := &router.ImgRoute{
 		Cfg:            cfg,
 		StaticService:  staticService,
 		SettingService: settingService,
 	}
+	logRoute := &router.LogRoute{
+		Cfg:        cfg,
+		LogService: logService,
+	}
 	routerRouter := &router.Router{
-		AboutRouter:        aboutRouter,
-		AnalysisRouter:     analysisRouter,
-		ArticleRouter:      articleRouter,
-		AuthRouter:         authRouter,
-		BackupRouter:       backupRouter,
-		UserRouter:         userRouter,
-		CaddyRouter:        caddyRouter,
-		CategoryRouter:     categoryRouter,
-		CollaboratorRouter: collaboratorRouter,
-		CustomPageRouter:   customPageRouter,
-		DraftRouter:        draftRouter,
-		LinkRouter:         linkRouter,
-		MenuRouter:         menuRouter,
-		MetaRouter:         metaRouter,
-		RewardRouter:       rewardRouter,
-		SettingRouter:      settingRouter,
-		SiteRouter:         siteRouter,
-		SocialRouter:       socialRouter,
-		TagRouter:          tagRouter,
-		TokenRouter:        tokenRouter,
-		PublicRouter:       publicRouter,
-		PipelineRouter:     pipelineRouter,
-		IsrRouter:          isrRouter,
-		ImgRouter:          imgRouter,
+		AboutRouter:        aboutRoute,
+		AnalysisRouter:     analysisRoute,
+		ArticleRouter:      articleRoute,
+		AuthRouter:         authRoute,
+		BackupRouter:       backupRoute,
+		UserRouter:         userRoute,
+		CaddyRouter:        caddyRoute,
+		CategoryRouter:     categoryRoute,
+		CollaboratorRouter: collaboratorRoute,
+		CustomPageRouter:   customPageRoute,
+		DraftRouter:        draftRoute,
+		LinkRouter:         linkRoute,
+		MenuRouter:         menuRoute,
+		MetaRouter:         metaRoute,
+		RewardRouter:       rewardRoute,
+		SettingRouter:      settingRoute,
+		SiteRouter:         siteRoute,
+		SocialRouter:       socialRoute,
+		TagRouter:          tagRoute,
+		TokenRouter:        tokenRoute,
+		PublicRouter:       publicRoute,
+		PipelineRouter:     pipelineRoute,
+		IsrRouter:          isrRoute,
+		ImgRouter:          imgRoute,
+		LogRoute:           logRoute,
 	}
 	repository := &repo.Repository{
 		ArticleRepository:    articleRepository,
@@ -355,7 +371,7 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 		CustomPageRepository: customPageRepository,
 		PipelineRepository:   pipelineRepository,
 	}
-	app := New(cfg, routerRouter, service, repository, database, isrEventBus, scriptEngine)
+	app := New(cfg, routerRouter, service, repository, database, isrEventBus, scriptEngine, logger)
 	return app, func() {
 		cleanup()
 	}, nil
@@ -365,4 +381,14 @@ func InitApp(ctx context.Context, cfg *config.Config) (*App, func(), error) {
 
 func mongodbConnect(cfg *config.Config) (*mongo.Database, func(), error) {
 	return mongodb.Connect(&cfg.Mongodb)
+}
+
+func NewEventBus() EventBus.Bus {
+	return EventBus.New()
+}
+
+func NewApmLogger(bus EventBus.Bus, cfg *config.Config) *apm.Logger {
+	logger := apm.NewLogger(bus, &cfg.Log.Apm)
+	apm.Init(logger)
+	return logger
 }

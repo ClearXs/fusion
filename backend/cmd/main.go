@@ -20,17 +20,6 @@ func main() {
 	if err != nil {
 		slog.Error("failed get config by config.yml", "err", err)
 	}
-	// init logger
-	logrus.SetFormatter(&logrus.JSONFormatter{})
-	logrus.SetOutput(os.Stdout)
-	level, err := logrus.ParseLevel(cfg.Log.Level)
-	if err != nil {
-		slog.Error("parse log level error", "system log level", cfg.Log.Level, "err", err)
-	} else {
-		logrus.SetLevel(level)
-	}
-	log := slog.New(logger.NewLogrusHandler(logrus.StandardLogger()))
-	slog.SetDefault(log)
 
 	// setup app
 	a, cleanup, err := app.InitApp(ctx, cfg)
@@ -40,6 +29,20 @@ func main() {
 		cancel()
 		panic(err)
 	}
+
+	// init logger
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetOutput(os.Stdout)
+	level, err := logrus.ParseLevel(cfg.Log.Level)
+	if err != nil {
+		slog.Error("parse log level error", "system log level", cfg.Log.Level, "err", err)
+	} else {
+		logrus.SetLevel(level)
+	}
+	standardLogger := logrus.StandardLogger()
+	standardLogger.SetOutput(a.Logger)
+	log := slog.New(logger.NewLogrusHandler(standardLogger))
+	slog.SetDefault(log)
 
 	// init gin
 	r := gin.New()
@@ -52,11 +55,12 @@ func main() {
 	// startup gin server
 	addr := ":" + strconv.Itoa(cfg.Server.Port)
 	fmt.Println(`
-  ____ _  _ ____ _ ____ _  _
-  |___ |  | [__  | |  | |\ |
-  |    |__| ___] | |__| | \|
+    ____ _  _ ____ _ ____ _  _
+    |___ |  | [__  | |  | |\ |
+    |    |__| ___] | |__| | \|
 
-    version` + env.Version + `     address` + addr + `
+    God’s Blessing on This Wonderful World!
+    version: ` + env.Version + `     address: ` + addr + `
 `)
 	err = r.Run(addr)
 	if err != nil {

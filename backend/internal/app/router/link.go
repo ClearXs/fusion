@@ -12,12 +12,12 @@ import (
 
 const LinkPathPrefix = "/api/admin/meta/link"
 
-type LinkRouter struct {
+type LinkRoute struct {
 	Cfg         *config.Config
 	MetaService *svr.MetaService
 }
 
-var LinkRouterSet = wire.NewSet(wire.Struct(new(LinkRouter), "*"))
+var LinkRouterSet = wire.NewSet(wire.Struct(new(LinkRoute), "*"))
 
 // GetLink
 // @Summary get link by meta
@@ -28,7 +28,7 @@ var LinkRouterSet = wire.NewSet(wire.Struct(new(LinkRouter), "*"))
 // @Produce json
 // @Success 200 {object} []domain.LinkItem
 // @Router /api/admin/meta/link [Get]
-func (l *LinkRouter) GetLink(c *gin.Context) *R {
+func (l *LinkRoute) GetLink(c *gin.Context) *R {
 	links := l.MetaService.GetLinks()
 	return Ok(links)
 }
@@ -43,7 +43,7 @@ func (l *LinkRouter) GetLink(c *gin.Context) *R {
 // @Param        link   body      domain.LinkItem   true  "link"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/link [Put]
-func (l *LinkRouter) UpdateLink(c *gin.Context) *R {
+func (l *LinkRoute) UpdateLink(c *gin.Context) *R {
 	if l.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -68,7 +68,7 @@ func (l *LinkRouter) UpdateLink(c *gin.Context) *R {
 // @Param        link   body      domain.LinkItem   true  "link"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/link [Post]
-func (l *LinkRouter) CreateLink(c *gin.Context) *R {
+func (l *LinkRoute) CreateLink(c *gin.Context) *R {
 	if l.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -92,7 +92,7 @@ func (l *LinkRouter) CreateLink(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} bool
 // @Router /api/admin/meta/link/:name [Delete]
-func (l *LinkRouter) DeleteLink(c *gin.Context) *R {
+func (l *LinkRoute) DeleteLink(c *gin.Context) *R {
 	if l.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -104,7 +104,7 @@ func (l *LinkRouter) DeleteLink(c *gin.Context) *R {
 	return Ok(deleted)
 }
 
-func (l *LinkRouter) Register(r *gin.Engine) {
+func (l *LinkRoute) Register(r *gin.Engine) {
 	r.GET(LinkPathPrefix, Handle(l.GetLink))
 	r.PUT(LinkPathPrefix, Handle(l.UpdateLink))
 	r.POST(LinkPathPrefix, Handle(l.CreateLink))

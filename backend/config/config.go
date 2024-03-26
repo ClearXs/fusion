@@ -1,6 +1,7 @@
 package config
 
 import (
+	"cc.allio/fusion/internal/apm"
 	"cc.allio/fusion/pkg/mongodb"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -14,8 +15,9 @@ type (
 		Path string `yaml:"path"`
 	}
 	Log struct {
-		Level string `yaml:"level"`
-		Path  string `yaml:"path"`
+		Level string           `yaml:"level"`
+		Path  string           `yaml:"path"`
+		Apm   apm.LoggerConfig `yaml:"apm"`
 	}
 	CodeRunner struct {
 		Path string `yaml:"path"`

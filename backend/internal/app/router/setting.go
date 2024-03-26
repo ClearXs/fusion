@@ -13,13 +13,13 @@ import (
 
 const SettingPathPrefix = "/api/admin/setting"
 
-type SettingRouter struct {
+type SettingRoute struct {
 	Cfg            *config.Config
 	SettingService *svr.SettingService
 	Isr            *event.IsrEventBus
 }
 
-var SettingRouterSet = wire.NewSet(wire.Struct(new(SettingRouter), "*"))
+var SettingRouterSet = wire.NewSet(wire.Struct(new(SettingRoute), "*"))
 
 // GetStaticSetting
 // @Summary get static setting
@@ -30,7 +30,7 @@ var SettingRouterSet = wire.NewSet(wire.Struct(new(SettingRouter), "*"))
 // @Produce json
 // @Success 200 {object} domain.StaticSetting
 // @Router /api/admin/setting/static [Get]
-func (s *SettingRouter) GetStaticSetting(c *gin.Context) *R {
+func (s *SettingRoute) GetStaticSetting(c *gin.Context) *R {
 	staticSetting := s.SettingService.FindStaticSetting()
 	return Ok(staticSetting)
 }
@@ -45,7 +45,7 @@ func (s *SettingRouter) GetStaticSetting(c *gin.Context) *R {
 // @Param        static   body      domain.StaticSetting   true  "static"
 // @Success 200 {object} bool
 // @Router /api/admin/setting/static [Put]
-func (s *SettingRouter) UpdateStaticSetting(c *gin.Context) *R {
+func (s *SettingRoute) UpdateStaticSetting(c *gin.Context) *R {
 	if s.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -69,7 +69,7 @@ func (s *SettingRouter) UpdateStaticSetting(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.WalineSetting
 // @Router /api/admin/setting/waline [Get]
-func (s *SettingRouter) GetWalineSetting(c *gin.Context) *R {
+func (s *SettingRoute) GetWalineSetting(c *gin.Context) *R {
 	waline := s.SettingService.FindWalineSetting()
 	return Ok(waline)
 }
@@ -84,7 +84,7 @@ func (s *SettingRouter) GetWalineSetting(c *gin.Context) *R {
 // @Param        waline   body      domain.WalineSetting   true  "waline"
 // @Success 200 {object} bool
 // @Router /api/admin/setting/waline [Put]
-func (s *SettingRouter) UpdateWalineSetting(c *gin.Context) *R {
+func (s *SettingRoute) UpdateWalineSetting(c *gin.Context) *R {
 	if s.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -108,7 +108,7 @@ func (s *SettingRouter) UpdateWalineSetting(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.LayoutSetting
 // @Router /api/admin/setting/layout [Get]
-func (s *SettingRouter) GetLayoutSetting(c *gin.Context) *R {
+func (s *SettingRoute) GetLayoutSetting(c *gin.Context) *R {
 	layout := s.SettingService.FindLayoutSetting()
 	return Ok(layout)
 }
@@ -123,7 +123,7 @@ func (s *SettingRouter) GetLayoutSetting(c *gin.Context) *R {
 // @Param        layout   body      domain.LayoutSetting   true  "layout"
 // @Success 200 {object} bool
 // @Router /api/admin/setting/layout [Put]
-func (s *SettingRouter) UpdateLayoutSetting(c *gin.Context) *R {
+func (s *SettingRoute) UpdateLayoutSetting(c *gin.Context) *R {
 	if s.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -148,7 +148,7 @@ func (s *SettingRouter) UpdateLayoutSetting(c *gin.Context) *R {
 // @Produce json
 // @Success 200 {object} domain.LoginSetting
 // @Router /api/admin/setting/login [Get]
-func (s *SettingRouter) GetLoginSetting(c *gin.Context) *R {
+func (s *SettingRoute) GetLoginSetting(c *gin.Context) *R {
 	login := s.SettingService.FindLoginSetting()
 	return Ok(login)
 }
@@ -163,7 +163,7 @@ func (s *SettingRouter) GetLoginSetting(c *gin.Context) *R {
 // @Param        login   body      domain.LoginSetting   true  "login"
 // @Success 200 {object} bool
 // @Router /api/admin/setting/login [Put]
-func (s *SettingRouter) UpdateLoginSetting(c *gin.Context) *R {
+func (s *SettingRoute) UpdateLoginSetting(c *gin.Context) *R {
 	if s.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -178,7 +178,7 @@ func (s *SettingRouter) UpdateLoginSetting(c *gin.Context) *R {
 	return Ok(successed)
 }
 
-func (s *SettingRouter) Register(r *gin.Engine) {
+func (s *SettingRoute) Register(r *gin.Engine) {
 	r.GET(SettingPathPrefix+"/static", Handle(s.GetStaticSetting))
 	r.PUT(SettingPathPrefix+"/static", Handle(s.UpdateStaticSetting))
 

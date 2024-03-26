@@ -13,13 +13,13 @@ import (
 
 const MenuPathPrefix = "/api/admin/meta/menu"
 
-type MenuRouter struct {
+type MenuRoute struct {
 	Cfg             *config.Config
 	SettingsService *svr.SettingService
 	Isr             *event.IsrEventBus
 }
 
-var MenuRouterSet = wire.NewSet(wire.Struct(new(MenuRouter), "*"))
+var MenuRouterSet = wire.NewSet(wire.Struct(new(MenuRoute), "*"))
 
 // GetMenu
 // @Summary get menu by settings
@@ -30,7 +30,7 @@ var MenuRouterSet = wire.NewSet(wire.Struct(new(MenuRouter), "*"))
 // @Produce json
 // @Success 200 {object} []domain.MenuItem
 // @Router /api/admin/meta/menu [Get]
-func (m *MenuRouter) GetMenu(c *gin.Context) *R {
+func (m *MenuRoute) GetMenu(c *gin.Context) *R {
 	settings := m.SettingsService.FindMenuSettings()
 	return Ok(settings)
 }
@@ -45,7 +45,7 @@ func (m *MenuRouter) GetMenu(c *gin.Context) *R {
 // @Param        menu   body      domain.MenuItem   true  "menu"
 // @Success 200 {object} bool
 // @Router /api/admin/meta/menu [Put]
-func (m *MenuRouter) UpdateMenu(c *gin.Context) *R {
+func (m *MenuRoute) UpdateMenu(c *gin.Context) *R {
 	if m.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
@@ -61,7 +61,7 @@ func (m *MenuRouter) UpdateMenu(c *gin.Context) *R {
 	return Ok(successd)
 }
 
-func (m *MenuRouter) Register(r *gin.Engine) {
+func (m *MenuRoute) Register(r *gin.Engine) {
 	r.GET(MenuPathPrefix, Handle(m.GetMenu))
 	r.PUT(MenuPathPrefix, Handle(m.UpdateMenu))
 }

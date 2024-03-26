@@ -95,7 +95,7 @@ func handleSaveMany(coll *mongo.Collection, insert []interface{}, opts ...*optio
 
 // handleUpdate handle domain object on update
 func handleUpdate(coll *mongo.Collection, filter mongodb.Logical, update bson.D, opts ...*options.UpdateOptions) (bool, error) {
-	result, err := coll.UpdateOne(context.TODO(), filter, update, opts...)
+	result, err := coll.UpdateOne(context.TODO(), filter.ToBson(), update, opts...)
 	if err != nil {
 		return false, err
 	}
@@ -104,7 +104,7 @@ func handleUpdate(coll *mongo.Collection, filter mongodb.Logical, update bson.D,
 
 // handleUpdateMany handle update many domain entity
 func handleUpdateMany(coll *mongo.Collection, filter mongodb.Logical, update bson.D, opts ...*options.UpdateOptions) (bool, error) {
-	result, err := coll.UpdateMany(context.TODO(), filter, update, opts...)
+	result, err := coll.UpdateMany(context.TODO(), filter.ToBson(), update, opts...)
 	if err != nil {
 		return false, err
 	}
@@ -113,7 +113,7 @@ func handleUpdateMany(coll *mongo.Collection, filter mongodb.Logical, update bso
 
 // handleRemove handle delete domain object
 func handleRemove(coll *mongo.Collection, filter mongodb.Logical, opts ...*options.DeleteOptions) (bool, error) {
-	result, err := coll.DeleteOne(context.TODO(), filter, opts...)
+	result, err := coll.DeleteOne(context.TODO(), filter.ToBson(), opts...)
 	if err != nil {
 		return false, err
 	}
@@ -122,7 +122,7 @@ func handleRemove(coll *mongo.Collection, filter mongodb.Logical, opts ...*optio
 
 // handleRemoveMany handle delete domain object
 func handleRemoveMany(coll *mongo.Collection, filter mongodb.Logical, opts ...*options.DeleteOptions) (bool, error) {
-	result, err := coll.DeleteMany(context.TODO(), filter, opts...)
+	result, err := coll.DeleteMany(context.TODO(), filter.ToBson(), opts...)
 	if err != nil {
 		return false, err
 	}
@@ -131,13 +131,13 @@ func handleRemoveMany(coll *mongo.Collection, filter mongodb.Logical, opts ...*o
 
 // handleCount handle domain object count of document
 func handleCount(coll *mongo.Collection, filter mongodb.Logical, opts ...*options.CountOptions) (int64, error) {
-	return coll.CountDocuments(context.TODO(), filter.GetBson(), opts...)
+	return coll.CountDocuments(context.TODO(), filter.ToBson(), opts...)
 }
 
 // handleFindOne handle find one
 // implementation support domain entity by 'new' function
 func handleFindOne[T interface{}](coll *mongo.Collection, new func() *T, filter mongodb.Logical, opts ...*options.FindOneOptions) (*T, error) {
-	result := coll.FindOne(context.TODO(), filter, opts...)
+	result := coll.FindOne(context.TODO(), filter.ToBson(), opts...)
 	if err := result.Err(); err != nil {
 		return nil, err
 	}
@@ -150,12 +150,13 @@ func handleFindOne[T interface{}](coll *mongo.Collection, new func() *T, filter 
 
 // handleFindList handle find list
 func handleFindList[T interface{}](coll *mongo.Collection, filter mongodb.Logical, opts ...*options.FindOptions) ([]*T, error) {
-	cursor, err := coll.Find(context.TODO(), filter.GetBson(), opts...)
+	ctx := context.Background()
+	cursor, err := coll.Find(ctx, filter.ToBson(), opts...)
 	if err != nil {
 		return nil, err
 	}
 	var domains = make([]*T, 0)
-	if err = cursor.Decode(domains); err != nil {
+	if err = cursor.All(ctx, &domains); err != nil {
 		return nil, err
 	}
 	return domains, nil

@@ -1,11 +1,9 @@
 package credential
 
-import "cc.allio/fusion/internal/domain"
-
 type StaticSearchOption struct {
-	Page       int               `json:"page"`
-	PageSize   int               `json:"pageSize"`
-	StaticType domain.StaticType `json:"staticType"`
+	Page       int    `json:"page"`
+	PageSize   int    `json:"pageSize"`
+	StaticType string `json:"staticType"`
 }
 
 type FilePathCredential struct {
