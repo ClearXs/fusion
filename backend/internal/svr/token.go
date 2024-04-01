@@ -4,8 +4,8 @@ import (
 	"cc.allio/fusion/config"
 	"cc.allio/fusion/internal/domain"
 	"cc.allio/fusion/internal/repo"
+	token2 "cc.allio/fusion/internal/token"
 	"cc.allio/fusion/pkg/mongodb"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -34,23 +34,23 @@ func (tokenSvr *TokenService) CreateApiToken(name string) (string, error) {
 	return tokenSvr.CreateToken(AdminId, name)
 }
 
-func (tokenSvr *TokenService) CreateToken(userId int64, userName string) (string, error) {
-	slog.Info("user %s created token", userName)
+func (tokenSvr *TokenService) CreateToken(userId int64, username string) (string, error) {
+	slog.Info("created token", "username", username)
 	loginSettings := tokenSvr.SettingsSvr.FindLoginSetting()
 	expireIn := loginSettings.ExpiresIn
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":   userId,
-		"name": userName,
-		"exp":  float64(expireIn),
-	})
-	singed, err := token.SigningString()
+	exp := time.Now().Add(time.Duration(expireIn))
+	tokenSigned, err := token2.CreateJwtToken(token2.Claims{
+		Id:   userId,
+		Name: username,
+		Exp:  float64(exp.Unix()),
+	}, tokenSvr.Cfg.Token.SignedKey)
 	if err != nil {
 		return "", err
 	}
 	defer func() {
 		t := &domain.Token{
 			UserId:    userId,
-			Token:     singed,
+			Token:     tokenSigned,
 			ExpiresIn: expireIn,
 			CreatedAt: time.Now(),
 			Disabled:  false,
@@ -60,7 +60,7 @@ func (tokenSvr *TokenService) CreateToken(userId int64, userName string) (string
 			slog.Error("token persistence failed", "err", err, "token", t)
 		}
 	}()
-	return singed, nil
+	return tokenSigned, nil
 }
 
 func (tokenSvr *TokenService) DisabledToken(token string) (bool, error) {

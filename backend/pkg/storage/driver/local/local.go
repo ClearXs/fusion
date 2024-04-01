@@ -1,6 +1,7 @@
 package local
 
 import (
+	"cc.allio/fusion/internal/token"
 	"cc.allio/fusion/pkg/storage"
 	"cc.allio/fusion/pkg/storage/driver"
 	"cc.allio/fusion/pkg/util"
@@ -30,7 +31,7 @@ func (l *Driver) Init() error {
 
 func (l *Driver) Sign(ctx context.Context, file *storage.FileHeader) (string, error) {
 	key := uuid.NewString()
-	return util.Encrypt(key), nil
+	return token.Encrypt(key), nil
 }
 
 func (l *Driver) Upload(ctx context.Context, file *storage.FileStream) error {

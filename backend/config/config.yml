@@ -32,3 +32,5 @@ mongodb:
   password: 123456
   db: fusion
 
+token:
+  signedKey: turbo

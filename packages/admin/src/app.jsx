@@ -207,10 +207,6 @@ export const layout = ({ initialState, setInitialState }) => {
         <HomeOutlined />
         <span>主站</span>
       </a>,
-      <Link key="AboutLink" to={'/about'}>
-        <ProjectOutlined />
-        <span>关于</span>
-      </Link>,
       <ThemeButton key="themeBtn" showText={true} />,
       <LogoutButton
         key="logoutSider"

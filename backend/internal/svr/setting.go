@@ -8,8 +8,10 @@ import (
 	"cc.allio/fusion/pkg/mongodb"
 	"cc.allio/fusion/pkg/storage"
 	"cc.allio/fusion/pkg/util"
+	"errors"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/exp/slog"
 )
 
@@ -70,18 +72,36 @@ func (s *SettingService) SaveOrUpdateStaticSetting(static *domain.StaticSetting)
 
 // ---------------------- login ----------------------
 
+// FindLoginSetting if login setting is null, will be invoked SaveOrUpdateLoginSetting domain.DefaultLoginSetting
 func (s *SettingService) FindLoginSetting() *domain.LoginSetting {
-	setting, err := s.SettingRepo.FindOne(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LoginSettingType}))
+	setting, err := util.TryThen[domain.Setting](
+		func() (*domain.Setting, error) {
+			return s.SettingRepo.FindOne(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LoginSettingType}))
+		},
+		func() (*domain.Setting, error) {
+			value := util.EntityToMap[*domain.LoginSetting](&domain.DefaultLoginSetting)
+			_, err := s.SettingRepo.Save(&domain.Setting{Type: LoginSettingType, Value: value})
+			if err != nil {
+				slog.Error("Failed to save default login setting.", "err", err)
+				return nil, err
+			}
+			// re find
+			return s.SettingRepo.FindOne(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LoginSettingType}))
+		},
+		func(err error) bool {
+			return errors.Is(err, mongo.ErrNoDocuments)
+		},
+	)
 	if err != nil {
-		slog.Error("Find static setting has error", "err", err)
+		slog.Error("Find https setting has error", "err", err)
 		return &domain.LoginSetting{}
 	}
 	value := setting.Value
 	loginSetting := &domain.LoginSetting{
 		EnableMaxLoginRetry: value["enableMaxLoginRetry"].(bool),
-		MaxRetryTimes:       value["maxRetryTimes"].(int64),
-		DurationSeconds:     value["durationSeconds"].(int64),
-		ExpiresIn:           value["expiresIn"].(int64),
+		MaxRetryTimes:       int64(value["maxRetryTimes"].(float64)),
+		DurationSeconds:     int64(value["durationSeconds"].(float64)),
+		ExpiresIn:           int64(value["expiresIn"].(float64)),
 	}
 	return loginSetting
 }

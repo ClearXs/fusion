@@ -25,6 +25,10 @@ type (
 	PluginRunner struct {
 		Path string `yaml:"path"`
 	}
+
+	Token struct {
+		SignedKey string `yaml:"signedKey"`
+	}
 )
 
 type Config struct {
@@ -35,6 +39,7 @@ type Config struct {
 	CodeRunner   CodeRunner      `yaml:"codeRunner"`
 	PluginRunner PluginRunner    `yaml:"pluginRunner"`
 	Mongodb      mongodb.Mongodb `yaml:"mongodb"`
+	Token        Token           `yaml:"token"`
 }
 
 func GetConfig() (*Config, error) {

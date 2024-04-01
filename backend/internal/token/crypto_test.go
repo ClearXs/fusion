@@ -1,4 +1,4 @@
-package util
+package token
 
 import (
 	"github.com/go-playground/assert/v2"

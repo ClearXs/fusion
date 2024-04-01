@@ -32,13 +32,6 @@ export default [
     hideInMenu: true,
     access: 'isAdmin',
   },
-  {
-    name: '关于',
-    icon: 'form',
-    path: '/about',
-    component: './About',
-    hideInMenu: true,
-  },
   { name: '草稿管理', icon: 'container', path: '/draft', component: './Draft' },
   {
     name: '图片管理',

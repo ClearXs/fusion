@@ -23,7 +23,7 @@ type Logical interface {
 	// AppendLogical 追加逻辑谓词
 	AppendLogical(other Logical) Logical
 	// ToBson 获取加上逻辑谓词的bson数据
-	ToBson() bson.E
+	ToBson() bson.D
 	// ToJsonString to json
 	ToJsonString() string
 }
@@ -146,15 +146,15 @@ func (logic *LogicalImpl) AppendArray(ele bson.D) Logical {
 }
 
 func (logic *LogicalImpl) AppendLogical(other Logical) Logical {
-	logic.additional = append(logic.additional, other.ToBson())
+	logic.additional = append(logic.additional, other.ToBson()...)
 	return logic
 }
 
-func (logic *LogicalImpl) ToBson() bson.E {
+func (logic *LogicalImpl) ToBson() bson.D {
 	if len(logic.additional) == 0 {
-		return bson.E{}
+		return bson.D{}
 	}
-	return bson.E{Key: logic.predicate, Value: logic.additional}
+	return bson.D{bson.E{Key: logic.predicate, Value: bson.A{logic.additional}}}
 }
 
 func (logic *LogicalImpl) ToJsonString() string {

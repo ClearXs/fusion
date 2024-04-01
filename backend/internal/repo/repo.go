@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"reflect"
 )
 
 const (
@@ -70,13 +71,20 @@ type DomainRepository[T interface{}] interface {
 
 // handleSave handle domain object on save
 func handleSave[T interface{}](coll *mongo.Collection, insert *T, opts ...*options.InsertOneOptions) (int64, error) {
-	result, err := coll.InsertOne(context.TODO(), insert, opts...)
+	v := reflect.ValueOf(insert)
+	idValue := v.Elem().FieldByName("Id")
+	nextId, err := mongodb.NextId()
+	if err != nil {
+		return -1, err
+	}
+	if idValue.CanSet() {
+		idValue.SetInt(int64(nextId))
+	}
+	_, err = coll.InsertOne(context.TODO(), insert, opts...)
 	if err != nil {
 		return int64(-1), err
 	}
-	idString := string(result.InsertedID.([]byte))
-	id := util.ToStringInt(idString, -1)
-	return int64(id), nil
+	return int64(nextId), nil
 }
 
 func handleSaveMany(coll *mongo.Collection, insert []interface{}, opts ...*options.InsertManyOptions) ([]int64, error) {
@@ -160,4 +168,20 @@ func handleFindList[T interface{}](coll *mongo.Collection, filter mongodb.Logica
 		return nil, err
 	}
 	return domains, nil
+}
+
+// writeTransaction wrap write concern writeTransaction open a write concern, and execute argument func f
+func writeTransaction[T interface{}](db *mongo.Database, f func(ctx mongo.SessionContext) (T, error)) (T, error) {
+	wc := db.WriteConcern()
+	txnOptions := options.Transaction().SetWriteConcern(wc)
+
+	client := db.Client()
+	session, err := client.StartSession()
+	if err != nil {
+		panic(err)
+	}
+	defer session.EndSession(context.TODO())
+	res, err := session.WithTransaction(context.TODO(), func(ctx mongo.SessionContext) (interface{}, error) { return f(ctx) }, txnOptions)
+	result := res.(T)
+	return result, err
 }

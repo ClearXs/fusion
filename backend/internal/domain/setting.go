@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type Setting struct {
 	Id    int64          `json:"id" bson:"id"`
 	Type  string         `bson:"type" json:"type"`
@@ -22,6 +24,13 @@ type LoginSetting struct {
 	MaxRetryTimes       int64 `json:"maxRetryTimes"`
 	DurationSeconds     int64 `json:"durationSeconds"`
 	ExpiresIn           int64 `json:"expiresIn"`
+}
+
+var DefaultLoginSetting = LoginSetting{
+	EnableMaxLoginRetry: false,
+	MaxRetryTimes:       int64(time.Minute),
+	DurationSeconds:     int64(30 * time.Second),
+	ExpiresIn:           int64(10 * time.Hour),
 }
 
 type HttpSetting struct {
