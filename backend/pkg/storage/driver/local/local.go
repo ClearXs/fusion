@@ -12,6 +12,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const perm = 0744
@@ -39,8 +40,13 @@ func (l *Driver) Upload(ctx context.Context, file *storage.FileStream) error {
 	dest := util.AbsolutePath(file.SavePath, l.Policy.BaseDir)
 	// create dir if not exist
 	dir := filepath.Dir(dest)
+	if strings.Index(dir, "/") == 0 {
+		// make relevant current dir
+		dir = dir[1:]
+		dest = dest[1:]
+	}
 	if !util.ExistFile(dir) {
-		err := os.Mkdir(dir, perm)
+		err := os.MkdirAll(dir, perm)
 		if err != nil {
 			slog.Error("Failed to create directory. ", "err", err, "dir", dir)
 			return err

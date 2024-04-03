@@ -6,7 +6,7 @@ import "golang.org/x/exp/slog"
 func GetValue[T interface{}](values map[string]any, key string, defaultValue T) T {
 	v, ok := values[key].(T)
 	if !ok {
-		slog.Debug("Failed to values according to specifies key obtain v", "key", key)
+		slog.Debug("Failed to values according to specifies key obtain v", "key", key, "values", values)
 		return defaultValue
 	}
 	return v

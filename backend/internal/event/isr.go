@@ -120,7 +120,7 @@ func (isr *IsrEventBus) ActivePost(args ...interface{}) {
 		if lo.IsNotEmpty(article.Pathname) {
 			isr.Active("/post/"+article.Pathname, args...)
 		} else {
-			isr.Active("/post/"+strconv.FormatInt(article.Id, 10), args...)
+			isr.Active("/post/"+article.Id, args...)
 		}
 	}
 }

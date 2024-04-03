@@ -7,7 +7,7 @@ import (
 )
 
 type Claims struct {
-	Id   int64            `json:"id"`
+	Id   string           `json:"id"`
 	Name string           `json:"name"`
 	Nbf  float64          `json:"nbf"`
 	Iat  float64          `json:"iat"`

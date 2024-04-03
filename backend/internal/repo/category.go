@@ -17,12 +17,12 @@ type CategoryRepository struct {
 
 var CategoryRepositorySet = wire.NewSet(wire.Struct(new(CategoryRepository), "*"))
 
-func (a *CategoryRepository) Save(insert *domain.Category, opts ...*options.InsertOneOptions) (int64, error) {
+func (a *CategoryRepository) Save(insert *domain.Category, opts ...*options.InsertOneOptions) (string, error) {
 	coll := a.Db.Collection(CategoryCollection)
 	return handleSave[domain.Category](coll, insert, opts...)
 }
 
-func (a *CategoryRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]int64, error) {
+func (a *CategoryRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
 	coll := a.Db.Collection(CategoryCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

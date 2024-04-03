@@ -47,7 +47,7 @@ func (collaborator *CollaboratorRoute) GetAllCollaboratorsList(c *gin.Context) *
 	siteInfo := collaborator.MetaService.GetSiteInfo()
 	admin := collaborator.UserService.GetUser()
 	collaborators := collaborator.UserService.GetAllCollaborators()
-	admin.Id = 0
+	admin.Id = "0"
 	admin.Nickname = siteInfo.Author
 	allCollaborators := append([]*domain.User{admin}, collaborators...)
 	return Ok(allCollaborators)

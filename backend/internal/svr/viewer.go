@@ -114,6 +114,6 @@ func (v *ViewerService) SaveOrUpdateViewer(dateViewer *domain.DateViewer) (bool,
 		if err != nil {
 			return false, err
 		}
-		return saved > 0, err
+		return saved != "", err
 	}
 }

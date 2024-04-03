@@ -3,12 +3,11 @@ package svr
 import (
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
-	DeleteFilter = bson.D{{"deleted", false}, {"deleted", primitive.E{Key: "$exists", Value: false}}}
-	HiddenFilter = bson.D{{"hidden", false}, {"hidden", primitive.E{Key: "$exists", Value: false}}}
+	DeleteFilter = bson.D{{"deleted", false}}
+	HiddenFilter = bson.D{{"hidden", false}}
 )
 
 type Service struct {

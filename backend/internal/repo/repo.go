@@ -2,7 +2,6 @@ package repo
 
 import (
 	"cc.allio/fusion/pkg/mongodb"
-	"cc.allio/fusion/pkg/util"
 	"context"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
@@ -58,8 +57,8 @@ var RepositorySet = wire.NewSet(
 )
 
 type DomainRepository[T interface{}] interface {
-	Save(insert *T, opts ...*options.InsertOneOptions) (int64, error)
-	SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]int64, error)
+	Save(insert *T, opts ...*options.InsertOneOptions) (string, error)
+	SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error)
 	Update(filter mongodb.Logical, update bson.D, opts ...*options.UpdateOptions) (bool, error)
 	UpdateMany(filter mongodb.Logical, update bson.D, opts ...*options.UpdateOptions) (bool, error)
 	Remove(filter mongodb.Logical, opts ...*options.DeleteOptions) (bool, error)
@@ -70,33 +69,32 @@ type DomainRepository[T interface{}] interface {
 }
 
 // handleSave handle domain object on save
-func handleSave[T interface{}](coll *mongo.Collection, insert *T, opts ...*options.InsertOneOptions) (int64, error) {
+func handleSave[T interface{}](coll *mongo.Collection, insert *T, opts ...*options.InsertOneOptions) (string, error) {
 	v := reflect.ValueOf(insert)
 	idValue := v.Elem().FieldByName("Id")
-	nextId, err := mongodb.NextId()
+	nextId, err := mongodb.NextStringId()
 	if err != nil {
-		return -1, err
+		return "", err
 	}
 	if idValue.CanSet() {
-		idValue.SetInt(int64(nextId))
+		idValue.SetString(nextId)
 	}
 	_, err = coll.InsertOne(context.TODO(), insert, opts...)
 	if err != nil {
-		return int64(-1), err
+		return "", err
 	}
-	return int64(nextId), nil
+	return nextId, nil
 }
 
-func handleSaveMany(coll *mongo.Collection, insert []interface{}, opts ...*options.InsertManyOptions) ([]int64, error) {
+func handleSaveMany(coll *mongo.Collection, insert []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
 	result, err := coll.InsertMany(context.TODO(), insert, opts...)
 	if err != nil {
-		return make([]int64, 0), err
+		return make([]string, 0), err
 	}
-	ids := make([]int64, 0)
+	ids := make([]string, 0)
 	for _, insertedId := range result.InsertedIDs {
 		idString := string(insertedId.([]byte))
-		id := util.ToStringInt(idString, -1)
-		ids = append(ids, int64(id))
+		ids = append(ids, idString)
 	}
 	return ids, nil
 }

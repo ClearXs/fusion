@@ -126,7 +126,8 @@ func (d *DraftService) Create(draft *domain.Draft) (*domain.Draft, error) {
 	if err != nil {
 		return nil, err
 	}
-	if saved < 0 {
+
+	if saved == "" {
 		return nil, errors.New("create draft error")
 	}
 	return draft, nil
@@ -152,10 +153,10 @@ func (d *DraftService) Publish(id int64, option *credential.DraftPublishCredenti
 	return d.ArticleSvr.Create(article)
 }
 
-func (d *DraftService) getNextId() (int64, error) {
+func (d *DraftService) getNextId() (string, error) {
 	result, err := d.DraftRepo.FindOne(mongodb.NewLogical(), &options.FindOneOptions{Sort: bson.E{Key: "id", Value: -1}})
 	if err != nil {
-		return -1, err
+		return "", err
 	}
-	return result.Id + 1, nil
+	return string(rune(util.ToStringInt(result.Id, -1) + 1)), nil
 }

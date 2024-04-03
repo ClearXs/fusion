@@ -70,7 +70,7 @@ func (p *PipelineService) CreatePipeline(pipeline *domain.Pipeline) (bool, error
 	if err != nil {
 		return false, err
 	}
-	return saved > 0, nil
+	return saved != "", nil
 }
 
 func (p *PipelineService) UpdatePipeline(pipeline *domain.Pipeline) (bool, error) {

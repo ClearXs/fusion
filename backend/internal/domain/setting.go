@@ -3,7 +3,7 @@ package domain
 import "time"
 
 type Setting struct {
-	Id    int64          `json:"id" bson:"id"`
+	Id    string         `bson:"_id" json:"id"`
 	Type  string         `bson:"type" json:"type"`
 	Value map[string]any `bson:"value" json:"value"`
 }

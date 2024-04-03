@@ -14,7 +14,7 @@ const (
 type Permission string
 
 type User struct {
-	Id          int64        `json:"id" bson:"id"`
+	Id          string       `bson:"_id" json:"id"`
 	Name        string       `bson:"name" json:"name"`
 	Password    string       `bson:"password" json:"password"`
 	CreatedAt   time.Time    `bson:"createdAt" json:"createdAt"`

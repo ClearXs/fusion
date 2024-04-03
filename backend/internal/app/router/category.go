@@ -136,7 +136,7 @@ func (category *CategoryRoute) UpdateCategory(c *gin.Context) *R {
 }
 
 func (category *CategoryRoute) Register(r *gin.Engine) {
-	r.GET(CategoryPathPrefix+"all", Handle(category.GetAllTags))
+	r.GET(CategoryPathPrefix+"/all", Handle(category.GetAllTags))
 
 	r.GET(CategoryPathPrefix+"/:name", Handle(category.GetArticlesByName))
 

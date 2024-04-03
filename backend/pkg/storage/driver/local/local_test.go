@@ -28,6 +28,10 @@ func TestHandle_Upload(t *testing.T) {
 			SavePath: "inner/TestHandle_Upload.txt",
 			File:     io.NopCloser(strings.NewReader("")),
 		},
+		{
+			SavePath: "inner/sub/TestHandle_Upload.txt",
+			File:     io.NopCloser(strings.NewReader("")),
+		},
 	}
 	for _, fileCase := range testCases {
 		err := driver.Upload(context.Background(), fileCase)

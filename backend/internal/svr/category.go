@@ -58,7 +58,7 @@ func (c *CategoryService) GetAllCategoryKeys() []string {
 		return []string{}
 	}
 	if categories != nil {
-		keys := make([]string, len(categories))
+		keys := make([]string, 0)
 
 		for _, category := range categories {
 			keys = append(keys, category.Name)
@@ -115,7 +115,7 @@ func (c *CategoryService) Add(name string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return successd > 0, nil
+	return successd != "", nil
 }
 
 func (c *CategoryService) Remove(name string) (bool, error) {
@@ -155,10 +155,10 @@ func (c *CategoryService) Update(entity *domain.Category) (bool, error) {
 	return updated, nil
 }
 
-func (c *CategoryService) getNextId() (int64, error) {
+func (c *CategoryService) getNextId() (string, error) {
 	result, err := c.CategoryRepo.FindOne(mongodb.NewLogical(), &options.FindOneOptions{Sort: bson.E{Key: "id", Value: -1}})
 	if err != nil {
-		return -1, err
+		return "", err
 	}
-	return result.Id + 1, nil
+	return string(rune(util.ToStringInt(result.Id, -1) + 1)), nil
 }

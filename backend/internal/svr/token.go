@@ -34,7 +34,7 @@ func (tokenSvr *TokenService) CreateApiToken(name string) (string, error) {
 	return tokenSvr.CreateToken(AdminId, name)
 }
 
-func (tokenSvr *TokenService) CreateToken(userId int64, username string) (string, error) {
+func (tokenSvr *TokenService) CreateToken(userId string, username string) (string, error) {
 	slog.Info("created token", "username", username)
 	loginSettings := tokenSvr.SettingsSvr.FindLoginSetting()
 	expireIn := loginSettings.ExpiresIn

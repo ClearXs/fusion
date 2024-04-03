@@ -13,7 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/exp/slog"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -128,7 +127,7 @@ func (a *ArticleService) Create(article *domain.Article) (*domain.Article, error
 	return article, nil
 }
 
-func (a *ArticleService) UpdateById(id int64, article *domain.Article) bool {
+func (a *ArticleService) UpdateById(id string, article *domain.Article) bool {
 	filter := mongodb.NewLogicalDefault(bson.E{Key: "id", Value: id})
 	articleBson := util.ToBsonElements(article)
 	update := bson.D{{"$set", articleBson}}
@@ -139,7 +138,7 @@ func (a *ArticleService) UpdateById(id int64, article *domain.Article) bool {
 	return updated
 }
 
-func (a *ArticleService) GetById(id int64) *domain.Article {
+func (a *ArticleService) GetById(id string) *domain.Article {
 	filter := mongodb.NewLogicalDefault(bson.E{Key: "id", Value: id})
 	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(DeleteFilter))
 	article, err := a.ArticleRepo.FindOne(filter)
@@ -186,7 +185,7 @@ func (a *ArticleService) GetByOption(option credential.ArticleSearchOptionCreden
 	} else if option.SortCreatedAt == domain.DescSort {
 		sort = bson.E{Key: "created", Value: -1}
 	}
-	if &sort != nil {
+	if &sort != nil && lo.IsNotEmpty(sort.Key) {
 		opt.Sort = sort
 	}
 
@@ -224,13 +223,13 @@ func (a *ArticleService) GetByOption(option credential.ArticleSearchOptionCreden
 	if lo.IsNotEmpty(option.StartTime) || lo.IsNotEmpty(option.EndTime) {
 		timeFilter := make([]bson.E, 0)
 		if lo.IsNotEmpty(option.StartTime) {
-			startTime, err := time.Parse(time.DateTime, option.StartTime)
+			startTime, err := time.Parse(time.DateOnly, option.StartTime)
 			if err == nil {
 				timeFilter = append(timeFilter, bson.E{Key: "$gte", Value: startTime})
 			}
 		}
 		if lo.IsNotEmpty(option.EndTime) {
-			endTime, err := time.Parse(time.DateTime, option.EndTime)
+			endTime, err := time.Parse(time.DateOnly, option.EndTime)
 			if err == nil {
 				timeFilter = append(timeFilter, bson.E{Key: "$lte", Value: endTime})
 			}
@@ -467,17 +466,16 @@ func (a *ArticleService) GetTotalNum(includeHidden bool) int64 {
 }
 
 // UpdateTags by article id set new tags
-func (a *ArticleService) UpdateTags(id int64, newTags []string) (bool, error) {
-	return a.ArticleRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: id}), bson.D{{"tags", newTags}})
+func (a *ArticleService) UpdateTags(id string, newTags []string) (bool, error) {
+	return a.ArticleRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "_id", Value: id}), bson.D{{"$set", bson.D{{"tags", newTags}}}})
 }
 
 func (a *ArticleService) getArticleByIdOrPathname(idOrPathname string) *domain.Article {
 	var article *domain.Article
-	id, err := strconv.Atoi(idOrPathname)
-	if err == nil {
-		article = a.GetById(int64(id))
-	} else {
+	article = a.GetById(idOrPathname)
+	if article == nil {
 		article = a.GetByPathname(idOrPathname)
+
 	}
 	return article
 }

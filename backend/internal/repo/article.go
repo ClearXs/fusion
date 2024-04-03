@@ -17,12 +17,12 @@ type ArticleRepository struct {
 
 var ArticleRepositorySet = wire.NewSet(wire.Struct(new(ArticleRepository), "*"))
 
-func (a *ArticleRepository) Save(insert *domain.Article, opts ...*options.InsertOneOptions) (int64, error) {
+func (a *ArticleRepository) Save(insert *domain.Article, opts ...*options.InsertOneOptions) (string, error) {
 	coll := a.Db.Collection(ArticleCollection)
 	return handleSave[domain.Article](coll, insert, opts...)
 }
 
-func (a *ArticleRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]int64, error) {
+func (a *ArticleRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
 	coll := a.Db.Collection(ArticleCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

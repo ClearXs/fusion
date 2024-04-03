@@ -64,7 +64,7 @@ func (s *SettingService) SaveOrUpdateStaticSetting(static *domain.StaticSetting)
 		if err != nil {
 			return false, err
 		}
-		return saved > 0, nil
+		return saved != "", nil
 	} else {
 		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: StaticSettingType}), bson.D{{"value", value}})
 	}
@@ -115,7 +115,7 @@ func (s *SettingService) SaveOrUpdateLoginSetting(layout *domain.LoginSetting) (
 		if err != nil {
 			return false, err
 		}
-		return saved > 0, nil
+		return saved != "", nil
 	} else {
 		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LoginSettingType}), bson.D{{"value", value}})
 	}
@@ -182,7 +182,7 @@ func (s *SettingService) SaveOrUpdateMenuSettings(menu *domain.MenuItem) (bool, 
 		if err != nil {
 			return false, err
 		}
-		return saved > 0, nil
+		return saved != "", nil
 	} else {
 		settings := &domain.Setting{Type: MenuSettingType, Value: value}
 		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: MenuSettingType}), bson.D{{"value", settings}})
@@ -213,7 +213,7 @@ func (s *SettingService) SaveOrUpdateWalineSetting(waline *domain.WalineSetting)
 		if err != nil {
 			return false, err
 		}
-		return saved > 0, nil
+		return saved != "", nil
 	} else {
 		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: WalineSettingType}), bson.D{{"value", value}})
 	}
@@ -244,7 +244,7 @@ func (s *SettingService) SaveOrUpdateLayoutSetting(layout *domain.LayoutSetting)
 		if err != nil {
 			return false, err
 		}
-		return saved > 0, nil
+		return saved != "", nil
 	} else {
 		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LayoutSettingType}), bson.D{{"value", value}})
 	}
@@ -270,7 +270,7 @@ func (s *SettingService) SaveOrUpdateIsrSetting(isr *domain.IsrSetting) (bool, e
 		if err != nil {
 			return false, err
 		}
-		return saved > 0, nil
+		return saved != "", nil
 	} else {
 		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: IsrSettingType}), bson.D{{"value", value}})
 	}

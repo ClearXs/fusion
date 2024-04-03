@@ -17,12 +17,12 @@ type VisitRepository struct {
 
 var VisitRepositorySet = wire.NewSet(wire.Struct(new(VisitRepository), "*"))
 
-func (a *VisitRepository) Save(insert *domain.Visit, opts ...*options.InsertOneOptions) (int64, error) {
+func (a *VisitRepository) Save(insert *domain.Visit, opts ...*options.InsertOneOptions) (string, error) {
 	coll := a.Db.Collection(VisitCollection)
 	return handleSave[domain.Visit](coll, insert, opts...)
 }
 
-func (a *VisitRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]int64, error) {
+func (a *VisitRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
 	coll := a.Db.Collection(VisitCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

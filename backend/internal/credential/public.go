@@ -6,7 +6,7 @@ import (
 )
 
 type PublicArticle struct {
-	Id        int64     `json:"id"`
+	Id        string    `json:"id"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	Tags      []string  `json:"tags"`
@@ -20,7 +20,7 @@ type SiteMeta struct {
 	Version string   `json:"version"`
 	Tags    []string `json:"tags"`
 	Meta    struct {
-		Id             int64                `json:"id"`
+		Id             string               `json:"id"`
 		Links          []*domain.LinkItem   `json:"links"`
 		Socials        []*domain.SocialItem `json:"socials"`
 		Menus          []*domain.MenuItem   `json:"menus"`

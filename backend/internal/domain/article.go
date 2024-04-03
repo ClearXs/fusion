@@ -5,7 +5,7 @@ import (
 )
 
 type Article struct {
-	Id              int64     `bson:"id" json:"id"`
+	Id              string    `bson:"_id" json:"id"`
 	Title           string    `json:"title" bson:"title"`
 	Content         string    `json:"content" bson:"content"`
 	Tags            []string  `json:"tags" bson:"tags"`

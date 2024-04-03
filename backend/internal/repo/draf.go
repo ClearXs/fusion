@@ -17,12 +17,12 @@ type DraftRepository struct {
 
 var DraftRepositorySet = wire.NewSet(wire.Struct(new(DraftRepository), "*"))
 
-func (a *DraftRepository) Save(insert *domain.Draft, opts ...*options.InsertOneOptions) (int64, error) {
+func (a *DraftRepository) Save(insert *domain.Draft, opts ...*options.InsertOneOptions) (string, error) {
 	coll := a.Db.Collection(DraftCollection)
 	return handleSave[domain.Draft](coll, insert, opts...)
 }
 
-func (a *DraftRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]int64, error) {
+func (a *DraftRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
 	coll := a.Db.Collection(DraftCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

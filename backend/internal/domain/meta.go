@@ -100,7 +100,7 @@ var DefaultMenu = []MenuItem{
 	}}
 
 type Meta struct {
-	Id             int64         `json:"id" bson:"id"`
+	Id             string        `json:"id" bson:"_id"`
 	Links          []*LinkItem   `json:"links" bson:"links"`
 	Socials        []*SocialItem `json:"socials" bson:"socials"`
 	Menus          []*MenuItem   `json:"menus" bson:"menus"`
@@ -150,7 +150,7 @@ type SiteInfo struct {
 	Author                      string      `json:"author" bson:"author"`
 	AuthorLogo                  string      `json:"authorLogo" bson:"authorLogo"`
 	AuthorLogoDark              string      `json:"authorLogoDark" bson:"authorLogoDark"`
-	AuthDesc                    string      `json:"authDesc" bson:"authDesc"`
+	AuthorDesc                  string      `json:"authorDesc" bson:"authorDesc"`
 	SiteLogo                    string      `json:"siteLogo" bson:"siteLogo"`
 	SiteLogoDark                string      `json:"siteLogoDark" bson:"siteLogoDark"`
 	Favicon                     string      `json:"favicon" bson:"favicon"`

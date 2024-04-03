@@ -51,7 +51,9 @@ func (s *StaticService) GetAll(storageType domain.StaticType) []*domain.Static {
 
 func (s *StaticService) GetByOption(option *credential.StaticSearchOption) *domain.StaticPageResult {
 	filter := mongodb.NewLogical()
-	filter.Append(bson.E{Key: "staticType", Value: option.StaticType})
+	if lo.IsNotEmpty(option.StaticType) {
+		filter.Append(bson.E{Key: "staticType", Value: option.StaticType})
+	}
 	opt := options.FindOptions{}
 	if option.PageSize != -1 {
 		skip := int64(option.PageSize*option.Page - option.PageSize)

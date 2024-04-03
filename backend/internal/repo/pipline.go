@@ -17,12 +17,12 @@ type PipelineRepository struct {
 
 var PipelineRepositorySet = wire.NewSet(wire.Struct(new(PipelineRepository), "*"))
 
-func (a *PipelineRepository) Save(insert *domain.Pipeline, opts ...*options.InsertOneOptions) (int64, error) {
+func (a *PipelineRepository) Save(insert *domain.Pipeline, opts ...*options.InsertOneOptions) (string, error) {
 	coll := a.Db.Collection(PipelineCollection)
 	return handleSave[domain.Pipeline](coll, insert, opts...)
 }
 
-func (a *PipelineRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]int64, error) {
+func (a *PipelineRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
 	coll := a.Db.Collection(PipelineCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

@@ -310,7 +310,7 @@ func (p *PublicRoute) getBuildMeta(c *gin.Context) *R {
 		Version: version,
 		Tags:    tags,
 		Meta: struct {
-			Id             int64                `json:"id"`
+			Id             string               `json:"id"`
 			Links          []*domain.LinkItem   `json:"links"`
 			Socials        []*domain.SocialItem `json:"socials"`
 			Menus          []*domain.MenuItem   `json:"menus"`
@@ -322,7 +322,7 @@ func (p *PublicRoute) getBuildMeta(c *gin.Context) *R {
 			TotalWordCount int64                `json:"totalWordCount"`
 			Categories     []*domain.Category   `json:"categories"`
 		}(struct {
-			Id             int64
+			Id             string
 			Links          []*domain.LinkItem
 			Socials        []*domain.SocialItem
 			Menus          []*domain.MenuItem

@@ -17,12 +17,12 @@ type MetaRepository struct {
 
 var MetaRepositorySet = wire.NewSet(wire.Struct(new(MetaRepository), "*"))
 
-func (a *MetaRepository) Save(insert *domain.Meta, opts ...*options.InsertOneOptions) (int64, error) {
+func (a *MetaRepository) Save(insert *domain.Meta, opts ...*options.InsertOneOptions) (string, error) {
 	coll := a.Db.Collection(MetaCollection)
 	return handleSave[domain.Meta](coll, insert, opts...)
 }
 
-func (a *MetaRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]int64, error) {
+func (a *MetaRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
 	coll := a.Db.Collection(MetaCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

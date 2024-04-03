@@ -3,6 +3,7 @@ package mongodb
 import (
 	"github.com/sony/sonyflake"
 	"golang.org/x/exp/slog"
+	"strconv"
 	"time"
 )
 
@@ -21,4 +22,13 @@ func NextId() (uint64, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+// NextStringId return string id
+func NextStringId() (string, error) {
+	id, err := NextId()
+	if err != nil {
+		return "", err
+	}
+	return strconv.FormatUint(id, 10), nil
 }

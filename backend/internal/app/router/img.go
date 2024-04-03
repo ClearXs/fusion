@@ -70,9 +70,9 @@ func (i *ImgRoute) Upload(c *gin.Context) *R {
 	}
 
 	// determine whether file going on append watermark by file extension and with withWaterMark
-	withWaterMark := web.ParseBoolForPath(c, "withWaterMark")
+	withWaterMark := web.ParseBoolForQuery(c, "withWaterMark", false)
 	if format, err := imaging.FormatFromFilename(filename); err == nil && withWaterMark {
-		waterMarkText := c.Param("waterMarkText")
+		waterMarkText := c.Query("waterMarkText")
 		// append watermark
 		newFile, err := i.addWatermark(file, waterMarkText, format)
 		if err != nil {
