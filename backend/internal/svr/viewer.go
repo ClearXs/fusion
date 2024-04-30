@@ -6,8 +6,10 @@ import (
 	"cc.allio/fusion/internal/repo"
 	"cc.allio/fusion/pkg/mongodb"
 	"cc.allio/fusion/pkg/util"
+	"errors"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/exp/slog"
 	"time"
 )
@@ -37,7 +39,9 @@ func (v *ViewerService) GetViewerGrid(num int64) *domain.ViewerGrid {
 	for i := 0; i < int(num); i++ {
 		last := curDate.AddDate(0, 0, -1*i).Format(time.DateOnly)
 		lastDayData, err := v.ViewerRepo.FindOne(mongodb.NewLogicalDefault(bson.E{Key: "date", Value: last}))
-		if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			continue
+		} else if err != nil {
 			panic(err)
 		}
 		if i == 0 && lastDayData != nil {
@@ -66,7 +70,10 @@ func (v *ViewerService) GetViewerGrid(num int64) *domain.ViewerGrid {
 	}
 
 	gridEachDay := make([]domain.DateViewer, 0)
-	pre := &temArr[0]
+	var pre *domain.DateViewer
+	if len(temArr) > 0 {
+		pre = &temArr[0]
+	}
 	for i := 1; i < len(temArr); i++ {
 		curObj := &temArr[i]
 		if curObj != nil {
@@ -114,6 +121,6 @@ func (v *ViewerService) SaveOrUpdateViewer(dateViewer *domain.DateViewer) (bool,
 		if err != nil {
 			return false, err
 		}
-		return saved != "", err
+		return saved > 0, err
 	}
 }

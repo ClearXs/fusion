@@ -5,8 +5,8 @@ import (
 )
 
 type Token struct {
-	Id        string    `bson:"_id" json:"id"`
-	UserId    string    `json:"userId" bson:"userId"`
+	Id        uint64    `json:"id" bson:"id"`
+	UserId    uint64    `json:"userId" bson:"userId"`
 	Token     string    `json:"token" bson:"token"`
 	Name      string    `json:"name" bson:"name"`
 	ExpiresIn int64     `json:"expiresIn" bson:"expiresIn"`

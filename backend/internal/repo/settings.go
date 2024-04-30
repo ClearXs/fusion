@@ -17,12 +17,12 @@ type SettingsRepository struct {
 
 var SettingsRepositorySet = wire.NewSet(wire.Struct(new(SettingsRepository), "*"))
 
-func (a *SettingsRepository) Save(insert *domain.Setting, opts ...*options.InsertOneOptions) (string, error) {
+func (a *SettingsRepository) Save(insert *domain.Setting, opts ...*options.InsertOneOptions) (uint64, error) {
 	coll := a.Db.Collection(SettingsCollection)
 	return handleSave[domain.Setting](coll, insert, opts...)
 }
 
-func (a *SettingsRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
+func (a *SettingsRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]uint64, error) {
 	coll := a.Db.Collection(SettingsCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

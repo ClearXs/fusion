@@ -13,7 +13,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-const AdminId = "0"
+const AdminId uint64 = 0
 
 type UserService struct {
 	Cfg            *config.Config
@@ -115,7 +115,7 @@ func (userSvr *UserService) InsertCollaborator(collaborator *domain.User) (bool,
 	if err != nil {
 		return false, err
 	}
-	return save != "", nil
+	return save > 0, nil
 }
 
 func (userSvr *UserService) UpdateCollaborator(collaborator *domain.User) (bool, error) {

@@ -31,7 +31,10 @@ var MenuRouterSet = wire.NewSet(wire.Struct(new(MenuRoute), "*"))
 // @Success 200 {object} []domain.MenuItem
 // @Router /api/admin/meta/menu [Get]
 func (m *MenuRoute) GetMenu(c *gin.Context) *R {
-	settings := m.SettingsService.FindMenuSettings()
+	settings, err := m.SettingsService.FindMenuSettings()
+	if err != nil {
+		return InternalError(err)
+	}
 	return Ok(settings)
 }
 
@@ -49,11 +52,11 @@ func (m *MenuRoute) UpdateMenu(c *gin.Context) *R {
 	if m.Cfg.Demo {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
-	menu := &domain.MenuItem{}
-	if err := c.Bind(menu); err != nil {
+	var menus []*domain.MenuItem
+	if err := c.Bind(&menus); err != nil {
 		return InternalError(err)
 	}
-	successd, err := m.SettingsService.SaveOrUpdateMenuSettings(menu)
+	successd, err := m.SettingsService.SaveOrUpdateMenuSettings(menus)
 	if err != nil {
 		return InternalError(err)
 	}

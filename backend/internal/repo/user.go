@@ -17,12 +17,12 @@ type UserRepository struct {
 
 var UserRepositorySet = wire.NewSet(wire.Struct(new(UserRepository), "*"))
 
-func (a *UserRepository) Save(insert *domain.User, opts ...*options.InsertOneOptions) (string, error) {
+func (a *UserRepository) Save(insert *domain.User, opts ...*options.InsertOneOptions) (uint64, error) {
 	coll := a.Db.Collection(UserCollection)
 	return handleSave[domain.User](coll, insert, opts...)
 }
 
-func (a *UserRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
+func (a *UserRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]uint64, error) {
 	coll := a.Db.Collection(UserCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

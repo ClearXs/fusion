@@ -14,7 +14,7 @@ const rewites =
             },
             {
               source: "/api/:path*",
-              destination: "http://127.0.0.1:3000/api/:path*", // Proxy to Backend
+              destination: "http://127.0.0.1:5600/api/:path*", // Proxy to Backend
             },
           ];
         },

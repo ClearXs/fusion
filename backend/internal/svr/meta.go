@@ -48,7 +48,7 @@ func (m *MetaService) UpdateSiteInfo(siteInfo *domain.SiteInfo) (bool, error) {
 	value := util.Composition[domain.SiteInfo](meta.SiteInfo, siteInfo)
 
 	elements := util.ToBsonElements(value)
-	return m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "_id", Value: meta.Id}), bson.D{{"$set", bson.D{{"siteInfo", elements}}}})
+	return m.MetaRepo.Update(mongodb.NewLogical(), bson.D{{"$set", bson.D{{"siteInfo", elements}}}})
 }
 
 func (m *MetaService) GetTotalWords() int64 {
@@ -129,7 +129,7 @@ func (m *MetaService) AddOrUpdateReward(reward *domain.RewardItem) (bool, error)
 	if _, ok := lo.Find(meta.Rewards, func(item *domain.RewardItem) bool { return item.Name == reward.Name }); !ok {
 		rewards = append(rewards, reward)
 	}
-	return m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "_id", Value: meta.Id}), bson.D{{"$set", bson.D{{"$set", bson.D{{"rewards", rewards}}}}}})
+	return m.MetaRepo.Update(mongodb.NewLogical(), bson.D{{"$set", bson.D{{"$set", bson.D{{"rewards", rewards}}}}}})
 }
 
 func (m *MetaService) DeleteRewardByName(name string) (bool, error) {
@@ -142,7 +142,7 @@ func (m *MetaService) DeleteRewardByName(name string) (bool, error) {
 	}
 	rewards := meta.Rewards
 	rewards = lo.Filter(rewards, func(item *domain.RewardItem, index int) bool { return item.Name == name })
-	return m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "_id", Value: meta.Id}), bson.D{{"$set", bson.D{{"rewards", rewards}}}})
+	return m.MetaRepo.Update(mongodb.NewLogical(), bson.D{{"$set", bson.D{{"rewards", rewards}}}})
 }
 
 // --------------------- social ---------------------
@@ -172,7 +172,7 @@ func (m *MetaService) SaveOrUpdateSocial(social *domain.SocialItem) (bool, error
 	if _, ok := lo.Find(meta.Socials, func(item *domain.SocialItem) bool { return item.Type == social.Type }); !ok {
 		socials = append(socials, social)
 	}
-	return m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "_id", Value: meta.Id}), bson.D{{"$set", bson.D{{"socials", socials}}}})
+	return m.MetaRepo.Update(mongodb.NewLogical(), bson.D{{"$set", bson.D{{"socials", socials}}}})
 }
 
 func (m *MetaService) DeleteSocialByType(typeName string) (bool, error) {
@@ -185,7 +185,7 @@ func (m *MetaService) DeleteSocialByType(typeName string) (bool, error) {
 	}
 	socials := meta.Socials
 	socials = lo.Filter(socials, func(item *domain.SocialItem, index int) bool { return item.Type == typeName })
-	return m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "_id", Value: meta.Id}), bson.D{{"$set", bson.D{{"socials", socials}}}})
+	return m.MetaRepo.Update(mongodb.NewLogical(), bson.D{{"$set", bson.D{{"socials", socials}}}})
 }
 
 func (m *MetaService) AddViewer(isNew bool, pathname string, isNewByPath bool) *domain.DataViewer {
@@ -203,7 +203,7 @@ func (m *MetaService) AddViewer(isNew bool, pathname string, isNewByPath bool) *
 		newVisited += 1
 	}
 	if meta != nil {
-		m.MetaRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "_id", Value: meta.Id}), bson.D{{"$set", bson.D{{"viewer", newViewer}, {"visited", newVisited}}}})
+		m.MetaRepo.Update(mongodb.NewLogical(), bson.D{{"$set", bson.D{{"viewer", newViewer}, {"visited", newVisited}}}})
 	}
 	if strings.Contains(pathname, "post") {
 		m.updateViewerByPathname(strings.ReplaceAll(pathname, "post", ""), isNew)
@@ -256,7 +256,7 @@ func (v *MetaService) appendVisit(isNew bool, pathname string) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		return saved != "", nil
+		return saved > 0, nil
 	}
 }
 

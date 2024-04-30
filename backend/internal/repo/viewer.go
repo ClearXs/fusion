@@ -17,12 +17,12 @@ type ViewerRepository struct {
 
 var ViewerRepositorySet = wire.NewSet(wire.Struct(new(ViewerRepository), "*"))
 
-func (a *ViewerRepository) Save(insert *domain.Viewer, opts ...*options.InsertOneOptions) (string, error) {
+func (a *ViewerRepository) Save(insert *domain.Viewer, opts ...*options.InsertOneOptions) (uint64, error) {
 	coll := a.Db.Collection(ViewerCollection)
 	return handleSave[domain.Viewer](coll, insert, opts...)
 }
 
-func (a *ViewerRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
+func (a *ViewerRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]uint64, error) {
 	coll := a.Db.Collection(ViewerCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

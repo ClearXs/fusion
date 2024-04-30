@@ -127,9 +127,9 @@ func (a *ArticleService) Create(article *domain.Article) (*domain.Article, error
 	return article, nil
 }
 
-func (a *ArticleService) UpdateById(id string, article *domain.Article) bool {
+func (a *ArticleService) UpdateById(id uint64, article *domain.Article) bool {
 	filter := mongodb.NewLogicalDefault(bson.E{Key: "id", Value: id})
-	articleBson := util.ToBsonElements(article)
+	articleBson := util.ToBsonElements(article, "id")
 	update := bson.D{{"$set", articleBson}}
 	updated, err := a.ArticleRepo.Update(filter, update)
 	if err != nil {
@@ -138,7 +138,7 @@ func (a *ArticleService) UpdateById(id string, article *domain.Article) bool {
 	return updated
 }
 
-func (a *ArticleService) GetById(id string) *domain.Article {
+func (a *ArticleService) GetById(id uint64) *domain.Article {
 	filter := mongodb.NewLogicalDefault(bson.E{Key: "id", Value: id})
 	filter.AppendLogical(mongodb.NewLogicalOrDefaultArray(DeleteFilter))
 	article, err := a.ArticleRepo.FindOne(filter)
@@ -466,13 +466,14 @@ func (a *ArticleService) GetTotalNum(includeHidden bool) int64 {
 }
 
 // UpdateTags by article id set new tags
-func (a *ArticleService) UpdateTags(id string, newTags []string) (bool, error) {
-	return a.ArticleRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "_id", Value: id}), bson.D{{"$set", bson.D{{"tags", newTags}}}})
+func (a *ArticleService) UpdateTags(id uint64, newTags []string) (bool, error) {
+	return a.ArticleRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "id", Value: id}), bson.D{{"$set", bson.D{{"tags", newTags}}}})
 }
 
 func (a *ArticleService) getArticleByIdOrPathname(idOrPathname string) *domain.Article {
 	var article *domain.Article
-	article = a.GetById(idOrPathname)
+	id := util.ToStringInt(idOrPathname, 0)
+	article = a.GetById(uint64(id))
 	if article == nil {
 		article = a.GetByPathname(idOrPathname)
 

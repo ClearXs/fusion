@@ -10,6 +10,7 @@ const (
 )
 
 type CustomPage struct {
+	Id        uint64     `json:"id" bson:"id"`
 	Name      string     `json:"name" bson:"name"`
 	Path      string     `json:"path" bson:"path"`
 	Type      CustomType `json:"type" bson:"type"`

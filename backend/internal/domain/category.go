@@ -8,7 +8,7 @@ const (
 )
 
 type Category struct {
-	Id       string       `bson:"id" json:"id"`
+	Id       uint64       `json:"id" bson:"id"`
 	Name     string       `json:"name" bson:"name"`
 	Type     CategoryType `json:"type" bson:"type"`
 	Private  bool         `json:"private" bson:"private"`

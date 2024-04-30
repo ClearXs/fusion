@@ -82,8 +82,8 @@ func (a *ArticleRoute) GetArticleByOption(c *gin.Context) *R {
 // @Success 200 {object} domain.ArticlePageResult
 // @Router /api/admin/article/:id [Get]
 func (a *ArticleRoute) GetOneById(c *gin.Context) *R {
-	id := c.Param("id")
-	article := a.ArticleSvr.GetById(id)
+	id := web.ParseNumberForPath(c, "id", 0)
+	article := a.ArticleSvr.GetById(uint64(id))
 	return Ok(article)
 }
 
@@ -106,9 +106,9 @@ func (a *ArticleRoute) UpdateArticleById(c *gin.Context) *R {
 	if err != nil {
 		return InternalError(err)
 	}
-	id := c.Param("id")
+	id := web.ParseNumberForPath(c, "id", 0)
 	a.Script.DispatchBeforeUpdateArticleEvent(article)
-	updated := a.ArticleSvr.UpdateById(id, article)
+	updated := a.ArticleSvr.UpdateById(uint64(id), article)
 	a.Isr.ActiveAll("trigger incremental rendering by update article", article)
 	a.Script.DispatchAfterUpdateArticleEvent(article, updated)
 	return Ok(updated)

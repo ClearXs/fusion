@@ -8,13 +8,6 @@ import { history } from 'umi';
 import { genActiveObj } from '../../services/van-blog/activeColTools';
 export const columns = [
   {
-    dataIndex: 'id',
-    valueType: 'number',
-    title: 'ID',
-    width: 48,
-    search: false,
-  },
-  {
     title: '标题',
     dataIndex: 'title',
     width: 150,

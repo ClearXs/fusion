@@ -17,12 +17,12 @@ type StaticRepository struct {
 
 var StaticRepositorySet = wire.NewSet(wire.Struct(new(StaticRepository), "*"))
 
-func (a *StaticRepository) Save(insert *domain.Static, opts ...*options.InsertOneOptions) (string, error) {
+func (a *StaticRepository) Save(insert *domain.Static, opts ...*options.InsertOneOptions) (uint64, error) {
 	coll := a.Db.Collection(StaticCollection)
 	return handleSave[domain.Static](coll, insert, opts...)
 }
 
-func (a *StaticRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
+func (a *StaticRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]uint64, error) {
 	coll := a.Db.Collection(StaticCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

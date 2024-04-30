@@ -17,12 +17,12 @@ type CustomPageRepository struct {
 
 var CustomPageRepositorySet = wire.NewSet(wire.Struct(new(CustomPageRepository), "*"))
 
-func (a *CustomPageRepository) Save(insert *domain.CustomPage, opts ...*options.InsertOneOptions) (string, error) {
+func (a *CustomPageRepository) Save(insert *domain.CustomPage, opts ...*options.InsertOneOptions) (uint64, error) {
 	coll := a.Db.Collection(CustomPageCollection)
 	return handleSave[domain.CustomPage](coll, insert, opts...)
 }
 
-func (a *CustomPageRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
+func (a *CustomPageRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]uint64, error) {
 	coll := a.Db.Collection(CustomPageCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

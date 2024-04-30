@@ -1,7 +1,8 @@
-import { getMenu, updateMenu } from '@/services/van-blog/api';
-import { EditableProTable, useRefFunction } from '@ant-design/pro-components';
-import { message, Modal, Spin } from 'antd';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {getMenu, updateMenu} from '@/services/van-blog/api';
+import {EditableProTable, useRefFunction} from '@ant-design/pro-components';
+import {message, Modal, Spin} from 'antd';
+import {useCallback, useEffect, useRef, useState} from 'react';
+
 type DataSourceType = {
   id: React.Key;
   name: string;
@@ -46,8 +47,8 @@ export default function () {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await getMenu();
-      const menuData = data?.data || [];
+      const {data = []} = await getMenu();
+      const menuData = data || [];
       setDataSource(menuData);
       const expendKs = menuData.filter((e) => Boolean(e.children)).map((e) => e.id);
       setExpendKeys(expendKs);
@@ -65,7 +66,7 @@ export default function () {
   };
   const update = useCallback(
     async (vals) => {
-      await updateMenu({ data: vals });
+      await updateMenu(vals);
       //@ts-ignore
       fetchData();
     },
@@ -75,9 +76,9 @@ export default function () {
     {
       title: '菜单名',
       dataIndex: 'name',
-      formItemProps: (form, { rowIndex }) => {
+      formItemProps: (form, {rowIndex}) => {
         return {
-          rules: [{ required: true, message: '此项为必填项' }],
+          rules: [{required: true, message: '此项为必填项'}],
         };
       },
     },
@@ -85,9 +86,9 @@ export default function () {
       title: '跳转网址',
       dataIndex: 'value',
       tooltip: `内部地址需以 / 开头，外部地址请以协议开头( http/https )`,
-      formItemProps: (form, { rowIndex }) => {
+      formItemProps: (form, {rowIndex}) => {
         return {
-          rules: [{ required: true, message: '此项为必填项' }],
+          rules: [{required: true, message: '此项为必填项'}],
         };
       },
     },
@@ -184,7 +185,7 @@ export default function () {
           recordCreatorProps={{
             position: 'bottom',
             newRecordType: 'dataSource',
-            record: () => ({ id: getNewId(), level: 0 }),
+            record: () => ({id: getNewId(), level: 0}),
           }}
           loading={false}
           columns={columns}

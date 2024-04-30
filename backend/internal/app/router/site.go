@@ -51,6 +51,9 @@ func (s *SiteRoute) UpdateSite(c *gin.Context) *R {
 		return Error(http.StatusUnauthorized, errors.New("演示站禁止修改此项！"))
 	}
 	siteInfo := &domain.SiteInfo{}
+	if err := c.Bind(siteInfo); err != nil {
+		return InternalError(err)
+	}
 	successed, err := s.MetaService.UpdateSiteInfo(siteInfo)
 	if err != nil {
 		return InternalError(err)

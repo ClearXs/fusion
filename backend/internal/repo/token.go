@@ -17,12 +17,12 @@ type TokenRepository struct {
 
 var TokenRepositorySet = wire.NewSet(wire.Struct(new(TokenRepository), "*"))
 
-func (a *TokenRepository) Save(insert *domain.Token, opts ...*options.InsertOneOptions) (string, error) {
+func (a *TokenRepository) Save(insert *domain.Token, opts ...*options.InsertOneOptions) (uint64, error) {
 	coll := a.Db.Collection(TokenCollection)
 	return handleSave[domain.Token](coll, insert, opts...)
 }
 
-func (a *TokenRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
+func (a *TokenRepository) SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]uint64, error) {
 	coll := a.Db.Collection(TokenCollection)
 	return handleSaveMany(coll, inserts, opts...)
 }

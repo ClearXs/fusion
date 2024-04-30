@@ -9,7 +9,6 @@ import (
 	"errors"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/exp/slog"
 )
 
@@ -30,7 +29,7 @@ func (c *CategoryService) GetPipeData() []*domain.TypeValue[int64] {
 	if len(categoryKeys) < 0 {
 		return []*domain.TypeValue[int64]{}
 	}
-	typeValues := make([]*domain.TypeValue[int64], len(oldData))
+	typeValues := make([]*domain.TypeValue[int64], 0)
 	for _, key := range categoryKeys {
 		if data, ok := oldData[key]; ok {
 			typeValues = append(typeValues, &domain.TypeValue[int64]{
@@ -101,12 +100,10 @@ func (c *CategoryService) Add(name string) (bool, error) {
 	if result != nil {
 		return false, errors.New("duplicate classification name, create failed")
 	}
-	nextId, err := c.getNextId()
 	if err != nil {
 		return false, err
 	}
 	category := domain.Category{
-		Id:      nextId,
 		Name:    name,
 		Type:    domain.CategoryCategoryType,
 		Private: false,
@@ -115,7 +112,7 @@ func (c *CategoryService) Add(name string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return successd != "", nil
+	return successd > 0, nil
 }
 
 func (c *CategoryService) Remove(name string) (bool, error) {
@@ -153,12 +150,4 @@ func (c *CategoryService) Update(entity *domain.Category) (bool, error) {
 		return false, err
 	}
 	return updated, nil
-}
-
-func (c *CategoryService) getNextId() (string, error) {
-	result, err := c.CategoryRepo.FindOne(mongodb.NewLogical(), &options.FindOneOptions{Sort: bson.E{Key: "id", Value: -1}})
-	if err != nil {
-		return "", err
-	}
-	return string(rune(util.ToStringInt(result.Id, -1) + 1)), nil
 }

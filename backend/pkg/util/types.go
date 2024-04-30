@@ -31,7 +31,7 @@ func isNil(value reflect.Value) bool {
 	case reflect.Float32:
 		return value.Float() == 0
 	case reflect.Bool:
-		return value.Bool()
+		return value.Bool() != true
 	case reflect.String:
 		return value.String() == ""
 	case reflect.Interface:

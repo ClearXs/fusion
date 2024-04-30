@@ -5,7 +5,7 @@ import (
 )
 
 type Draft struct {
-	Id        string    `bson:"id" json:"id"`
+	Id        uint64    `json:"id" bson:"id"`
 	Title     string    `json:"title" bson:"title"`
 	Content   string    `json:"content" bson:"content"`
 	Tags      []string  `json:"tags" bson:"tags"`

@@ -6,7 +6,7 @@ import (
 )
 
 type PublicArticle struct {
-	Id        string    `json:"id"`
+	Id        uint64    `json:"id"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	Tags      []string  `json:"tags"`

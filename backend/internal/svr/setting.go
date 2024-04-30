@@ -11,6 +11,7 @@ import (
 	"errors"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/exp/slog"
 )
@@ -64,9 +65,9 @@ func (s *SettingService) SaveOrUpdateStaticSetting(static *domain.StaticSetting)
 		if err != nil {
 			return false, err
 		}
-		return saved != "", nil
+		return saved > 0, nil
 	} else {
-		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: StaticSettingType}), bson.D{{"value", value}})
+		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: StaticSettingType}), bson.D{{"$set", bson.D{{"value", value}}}})
 	}
 }
 
@@ -115,9 +116,9 @@ func (s *SettingService) SaveOrUpdateLoginSetting(layout *domain.LoginSetting) (
 		if err != nil {
 			return false, err
 		}
-		return saved != "", nil
+		return saved > 0, nil
 	} else {
-		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LoginSettingType}), bson.D{{"value", value}})
+		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LoginSettingType}), bson.D{{"$set", bson.D{{"value", value}}}})
 	}
 }
 
@@ -161,31 +162,43 @@ func (s *SettingService) SaveOrUpdateHttpsSetting(credential *credential.HttpsSe
 
 // ---------------------- menu ----------------------
 
-func (s *SettingService) FindMenuSettings() []*domain.MenuItem {
+func (s *SettingService) FindMenuSettings() ([]*domain.MenuItem, error) {
 	setting, err := s.SettingRepo.FindOne(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: MenuSettingType}))
 	if err != nil {
 		slog.Error("Find https setting has error", "err", err)
-		return make([]*domain.MenuItem, 0)
+		return make([]*domain.MenuItem, 0), nil
 	}
 	value := setting.Value
-	data := value["data"].([]map[string]any)
-	menus := util.MapArrayToEntityArray[*domain.MenuItem](data, func() *domain.MenuItem { return &domain.MenuItem{} })
-	return menus
+	data, ok := value["value"].(map[string]interface{})
+	if !ok {
+		return nil, errors.New("not found any menus")
+	}
+	menuValues, ok := data["data"].(primitive.A)
+	if !ok {
+		return nil, errors.New("not found any menus")
+	}
+
+	menus := make([]*domain.MenuItem, 0)
+	for _, dataValue := range menuValues {
+		menu := util.MapToEntity[*domain.MenuItem](dataValue.(map[string]interface{}), &domain.MenuItem{})
+		menus = append(menus, menu)
+	}
+	return menus, nil
 }
 
-func (s *SettingService) SaveOrUpdateMenuSettings(menu *domain.MenuItem) (bool, error) {
-	menus := s.FindMenuSettings()
+func (s *SettingService) SaveOrUpdateMenuSettings(menus []*domain.MenuItem) (bool, error) {
+	_, err := s.FindMenuSettings()
 	value := make(map[string]any)
-	value["data"] = util.EntityArrayToMapArray[*domain.MenuItem](append(menus, menu))
-	if len(menus) == 0 {
+	value["data"] = util.EntityArrayToMapArray[*domain.MenuItem](menus)
+	if err != nil {
 		saved, err := s.SettingRepo.Save(&domain.Setting{Type: MenuSettingType, Value: value})
 		if err != nil {
 			return false, err
 		}
-		return saved != "", nil
+		return saved > 0, nil
 	} else {
 		settings := &domain.Setting{Type: MenuSettingType, Value: value}
-		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: MenuSettingType}), bson.D{{"value", settings}})
+		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: MenuSettingType}), bson.D{{"$set", bson.D{{"value", settings}}}})
 	}
 }
 
@@ -213,9 +226,9 @@ func (s *SettingService) SaveOrUpdateWalineSetting(waline *domain.WalineSetting)
 		if err != nil {
 			return false, err
 		}
-		return saved != "", nil
+		return saved > 0, nil
 	} else {
-		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: WalineSettingType}), bson.D{{"value", value}})
+		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: WalineSettingType}), bson.D{{"$set", bson.D{{"value", value}}}})
 	}
 }
 
@@ -244,9 +257,9 @@ func (s *SettingService) SaveOrUpdateLayoutSetting(layout *domain.LayoutSetting)
 		if err != nil {
 			return false, err
 		}
-		return saved != "", nil
+		return saved > 0, nil
 	} else {
-		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LayoutSettingType}), bson.D{{"value", value}})
+		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: LayoutSettingType}), bson.D{{"$set", bson.D{{"value", value}}}})
 	}
 }
 
@@ -270,8 +283,8 @@ func (s *SettingService) SaveOrUpdateIsrSetting(isr *domain.IsrSetting) (bool, e
 		if err != nil {
 			return false, err
 		}
-		return saved != "", nil
+		return saved > 0, nil
 	} else {
-		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: IsrSettingType}), bson.D{{"value", value}})
+		return s.SettingRepo.Update(mongodb.NewLogicalDefault(bson.E{Key: "type", Value: IsrSettingType}), bson.D{{"$set", bson.D{{"value", value}}}})
 	}
 }

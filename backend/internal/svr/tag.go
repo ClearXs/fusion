@@ -22,7 +22,7 @@ func (t *TagService) GetColumnData(topNum int64, includeHidden bool) []*domain.T
 	for key := range data {
 		tags = append(tags, key)
 	}
-	typeValues := make([]*domain.TypeValue[int64], topNum)
+	typeValues := make([]*domain.TypeValue[int64], 0)
 	for index, tag := range tags {
 		if index+1 == int(topNum) {
 			break

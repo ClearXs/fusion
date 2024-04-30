@@ -138,13 +138,13 @@ func (caddy *CaddyRoute) getCaddyConfig(c *gin.Context) *R {
 }
 
 func (caddy *CaddyRoute) Register(r *gin.Engine) {
-	r.GET(CaddyPathPrefix+"https", Handle(caddy.GetHttpsSettings))
-	r.PUT(CaddyPathPrefix+"https", Handle(caddy.updateHttpsSettings))
+	r.GET(CaddyPathPrefix+"/https", Handle(caddy.GetHttpsSettings))
+	r.PUT(CaddyPathPrefix+"/https", Handle(caddy.updateHttpsSettings))
 
-	r.GET(CaddyPathPrefix+"ask", Handle(caddy.askOnDemand))
+	r.GET(CaddyPathPrefix+"/ask", Handle(caddy.askOnDemand))
 
-	r.GET(CaddyPathPrefix+"log", Handle(caddy.getLog))
-	r.DELETE(CaddyPathPrefix+"log", Handle(caddy.clearLog))
+	r.GET(CaddyPathPrefix+"/log", Handle(caddy.getLog))
+	r.DELETE(CaddyPathPrefix+"/log", Handle(caddy.clearLog))
 
-	r.GET(CaddyPathPrefix+"config", Handle(caddy.getCaddyConfig))
+	r.GET(CaddyPathPrefix+"/config", Handle(caddy.getCaddyConfig))
 }

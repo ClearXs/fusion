@@ -11,7 +11,7 @@ const (
 )
 
 type Pipeline struct {
-	Id        string    `bson:"_id" json:"id"`
+	Id        uint64    `json:"id" bson:"id"`
 	Name      string    `json:"name" bson:"name"`
 	EventType EventType `json:"eventType" bson:"eventType"`
 	EventName EventKey  `json:"eventName" bson:"eventName"`

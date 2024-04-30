@@ -3,6 +3,7 @@ package repo
 import (
 	"cc.allio/fusion/pkg/mongodb"
 	"context"
+	"errors"
 	"github.com/google/wire"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -57,8 +58,8 @@ var RepositorySet = wire.NewSet(
 )
 
 type DomainRepository[T interface{}] interface {
-	Save(insert *T, opts ...*options.InsertOneOptions) (string, error)
-	SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]string, error)
+	Save(insert *T, opts ...*options.InsertOneOptions) (uint64, error)
+	SaveMany(inserts []interface{}, opts ...*options.InsertManyOptions) ([]uint64, error)
 	Update(filter mongodb.Logical, update bson.D, opts ...*options.UpdateOptions) (bool, error)
 	UpdateMany(filter mongodb.Logical, update bson.D, opts ...*options.UpdateOptions) (bool, error)
 	Remove(filter mongodb.Logical, opts ...*options.DeleteOptions) (bool, error)
@@ -69,34 +70,43 @@ type DomainRepository[T interface{}] interface {
 }
 
 // handleSave handle domain object on save
-func handleSave[T interface{}](coll *mongo.Collection, insert *T, opts ...*options.InsertOneOptions) (string, error) {
-	v := reflect.ValueOf(insert)
-	idValue := v.Elem().FieldByName("Id")
-	nextId, err := mongodb.NextStringId()
+func handleSave[T interface{}](coll *mongo.Collection, insert *T, opts ...*options.InsertOneOptions) (uint64, error) {
+	id, err := setId(insert)
 	if err != nil {
-		return "", err
-	}
-	if idValue.CanSet() {
-		idValue.SetString(nextId)
+		return 0, err
 	}
 	_, err = coll.InsertOne(context.TODO(), insert, opts...)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
-	return nextId, nil
+	return id, nil
 }
 
-func handleSaveMany(coll *mongo.Collection, insert []interface{}, opts ...*options.InsertManyOptions) ([]string, error) {
-	result, err := coll.InsertMany(context.TODO(), insert, opts...)
-	if err != nil {
-		return make([]string, 0), err
+// handleSaveMany handle many domain object on save
+func handleSaveMany(coll *mongo.Collection, insert []interface{}, opts ...*options.InsertManyOptions) ([]uint64, error) {
+	ids := make([]uint64, 0)
+	for _, entity := range insert {
+		id, err := setId(entity)
+		if err != nil {
+			return make([]uint64, 0), err
+		}
+		ids = append(ids, id)
 	}
-	ids := make([]string, 0)
-	for _, insertedId := range result.InsertedIDs {
-		idString := string(insertedId.([]byte))
-		ids = append(ids, idString)
-	}
-	return ids, nil
+	return writeTransaction(coll.Database(), func(ctx mongo.SessionContext) ([]uint64, error) {
+		result, err := coll.InsertMany(context.TODO(), insert, opts...)
+		if err != nil {
+			return make([]uint64, 0), err
+		}
+		if len(result.InsertedIDs) != len(insert) {
+			err := ctx.AbortTransaction(context.TODO())
+			return make([]uint64, 0), errors.Join(err, errors.New("Failed to save many. "))
+		}
+		err = ctx.CommitTransaction(context.TODO())
+		if err != nil {
+			return ids, err
+		}
+		return make([]uint64, 0), err
+	})
 }
 
 // handleUpdate handle domain object on update
@@ -182,4 +192,20 @@ func writeTransaction[T interface{}](db *mongo.Database, f func(ctx mongo.Sessio
 	res, err := session.WithTransaction(context.TODO(), func(ctx mongo.SessionContext) (interface{}, error) { return f(ctx) }, txnOptions)
 	result := res.(T)
 	return result, err
+}
+
+// setId base on proxy set entity id
+func setId(entity interface{}) (uint64, error) {
+	v := reflect.ValueOf(entity)
+	idValue := v.Elem().FieldByName("Id")
+	nextId, err := mongodb.NextId()
+	if err != nil {
+		return 0, err
+	}
+	if idValue.CanSet() {
+		idValue.SetUint(nextId)
+		return nextId, nil
+	} else {
+		return 0, errors.New("unable set id")
+	}
 }

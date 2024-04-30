@@ -3,7 +3,7 @@ package domain
 import "time"
 
 type Setting struct {
-	Id    string         `bson:"_id" json:"id"`
+	Id    uint64         `json:"id" bson:"id"`
 	Type  string         `bson:"type" json:"type"`
 	Value map[string]any `bson:"value" json:"value"`
 }
@@ -17,6 +17,7 @@ type StaticSetting struct {
 	BaseDir         string `json:"baseDir" bson:"baseDir"`
 	WaterMarkText   string `json:"waterMarkText" bson:"waterMarkText"`
 	EnableWaterMark bool   `json:"enableWaterMark" bson:"enableWaterMark"`
+	EnableWebp      bool   `json:"enableWebp" bson:"enableWebp"`
 }
 
 type LoginSetting struct {

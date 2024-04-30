@@ -8,13 +8,6 @@ import { message, Modal, Tag } from 'antd';
 import { history } from 'umi';
 export const columns = [
   {
-    dataIndex: 'id',
-    valueType: 'number',
-    title: 'ID',
-    width: 48,
-    search: false,
-  },
-  {
     title: '标题',
     dataIndex: 'title',
     copyable: true,

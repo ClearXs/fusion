@@ -124,7 +124,7 @@ func (p *PublicRoute) searchArticle(c *gin.Context) *R {
 // @Success 200 {object} []domain.Article
 // @Router /api/public/viewer [Post]
 func (p *PublicRoute) addViewer(c *gin.Context) *R {
-	refer := c.Request.Header.Get("refer")
+	refer := c.Request.Header.Get("Referer")
 	uri, err := url.ParseRequestURI(refer)
 	if err != nil {
 		return InternalError(err)
@@ -301,7 +301,7 @@ func (p *PublicRoute) getBuildMeta(c *gin.Context) *R {
 	tags := p.TagService.GetAllTags(false)
 	meta := p.MetaService.GetMeta()
 	categories := p.CategoryService.GetAllCategories()
-	menus := p.SettingService.FindMenuSettings()
+	menus, _ := p.SettingService.FindMenuSettings()
 	totalArticles := p.ArticleService.GetTotalNum(false)
 	totalWords := p.MetaService.GetTotalWords()
 	layoutSetting := p.SettingService.FindLayoutSetting()
